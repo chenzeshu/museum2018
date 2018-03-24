@@ -10,11 +10,7 @@ class TestController extends Controller
 {
     public function test()
     {
-        $data = Performance::offset(1)
-            ->limit(10)
-            ->with(['perfActors', 'perfDetail', 'perfType'])
-            ->get()
-            ->toArray();
+        $data = Performance::findOrFail(1)->actors()->get();
         return $data;
     }
 }

@@ -27,15 +27,20 @@
         },
         methods:{
             checkExp(){
-                let token = storage.get('token').replace(/Bearer /, "").split(".")[1],
-                    exp = new Base64().decode(token).replace("{","").replace("}","").split(",")[3].slice(-10)*1000,
-                    now = Date.now()
-                if(exp < now){
-                    // 已经过期
+                let token = storage.get('token')
+                if(!token){
                     this.changeFlagLogin(false)
                 }else{
-                    // 为过期
-                    this.changeFlagLogin(true)
+                    token = token.replace(/Bearer /, "").split(".")[1]
+                    let exp = new Base64().decode(token).replace("{","").replace("}","").split(",")[3].slice(-10)*1000,
+                        now = Date.now()
+                    if(exp < now){
+                        // 已经过期
+                        this.changeFlagLogin(false)
+                    }else{
+                        // 为过期
+                        this.changeFlagLogin(true)
+                    }
                 }
             },
             test(){

@@ -33,7 +33,7 @@ $factory->define(App\Model\Perf\Performance::class, function (Faker $faker){
         'perf_date' => $faker->dateTime(),
         'perf_type' => rand(1, 10),
         'perf_troupe' => rand(1, 10),
-        'perf_address' => rand(1, 10),
+        'perf_addr' => rand(1, 10),
         'perf_duration' => rand(50, 1000),
         'perf_size' => rand(100, 2000)
     ];

@@ -14,3 +14,13 @@ let mix = require('laravel-mix');
 mix.js('resources/assets/js/app.js', 'public/js')
    .extract(['vue'])
    .stylus('resources/assets/stylus/index.styl', 'public/css');
+
+mix.webpackConfig({
+    resolve: {
+        alias: {
+            "@style": path.resolve(__dirname, 'resources/assets/stylus/'),
+            "@home": path.resolve(__dirname, 'resources/assets/js/components/home/'),
+            "@utils": path.resolve(__dirname, 'resources/assets/js/utils/'),
+        }
+    }
+})

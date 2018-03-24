@@ -22,14 +22,14 @@ class CreatePerformancesTable extends Migration
             $table->timestamp('perf_date')->comment('演出时间');
             $table->unsignedTinyInteger('perf_type')->nullable()->comment('剧种');
             $table->unsignedInteger('perf_troupe')->nullable()->comment('剧团');
-            $table->unsignedInteger('perf_address')->nullable()->comment('演出地点');
+            $table->unsignedInteger('perf_addr')->nullable()->comment('演出地点');
             $table->unsignedSmallInteger('perf_duration')->nullable()->comment('视频时长，分钟');
             $table->unsignedMediumInteger('perf_size')->nullable()->comment('视频大小，MB');
             $table->timestamps();
 
             $table->index('perf_type')->comment('索引：去找剧种信息');
             $table->index('perf_troupe')->comment('索引：去找剧团信息');
-            $table->index('perf_address')->comment('索引：去找演出地点信息');
+            $table->index('perf_addr')->comment('索引：去找演出地点信息');
         });
 
         //演出细节表

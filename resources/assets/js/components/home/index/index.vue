@@ -1,5 +1,12 @@
 <template>
     <div class="layout home">
+        <!--注销-->
+        <transition name="move">
+            <div class="topbar-right">
+                <span class="topbar-right-logout" @click="logout">注销</span>
+            </div>
+        </transition>
+
         <Layout>
             <Sider ref="side1" hide-trigger collapsible :collapsed-width="78" v-model="isCollapsed" style="min-height:99.5vh">
                 <Menu :active-name="activeName" :open-names="openNames" theme="dark" width="auto" :class="menuitemClasses"
@@ -29,12 +36,24 @@
 </template>
 
 <style type="text/stylus" rel="stylesheet/stylus" lang="stylus">
+    @import "~@style/params"
+
     .layout
         border: 1px solid #d7dde4;
         background: #f5f7f9;
         position: relative;
         border-radius: 4px;
         overflow: hidden;
+    .topbar-right
+        position fixed
+        left 254px
+        top 20px
+        width 200px
+        height 32px
+        font-size 18px
+        cursor pointer
+        .topbar-right-logout:hover
+            color: $color-button
     .layout-header-bar
         background: #fff;
         box-shadow: 0 1px 1px rgba(0,0,0,.1);
@@ -72,6 +91,8 @@
 </style>
 
 <script>
+    import {mapGetters, mapMutations} from 'vuex'
+    import storage from 'good-storage'
     export default {
         data () {
             return {
@@ -168,17 +189,35 @@
                     'menu-item',
                     this.isCollapsed ? 'collapsed-menu' : ''
                 ]
-            }
+            },
+            ...mapGetters([
+                'flagLogin'
+            ])
         },
         methods: {
             collapsedSider () {
                 this.$refs.side1.toggleCollapse();
-                // console.log(this.$refs.subMenu)
+                //注销条也左移
+                this._collasedBarTransition()
+            },
+            //注销条缩展动画
+            _collasedBarTransition(){
+                let topbarRight = document.querySelectorAll('.topbar-right')[0]
+                topbarRight.style.transform = this.isCollapsed ? `translate3d(-122px,0,0)` : `translate3d(0,0,0)`
+                topbarRight.style.transitionDuration = this.isCollapsed ? `.4s` : `.2s`
+                topbarRight.style.transitionTimingFunction = `ease`
+            },
+            logout(){
+                  this.changeFlagLogin(false)
+                  storage.set('token', "")
             },
             //todo 跳转到，避免直接使用<router-link>导致文字颜色动效失效
             navigateTo(path){
                 this.$router.push(path)
-            }
+            },
+            ...mapMutations({
+                changeFlagLogin: 'CHANGE_FLAG_LOGIN'
+            })
         }
     }
 </script>

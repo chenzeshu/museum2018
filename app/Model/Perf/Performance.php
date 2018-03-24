@@ -28,7 +28,7 @@ class Performance extends Model
      */
     public function perfActors()
     {
-        return $this->hasManyThrough(Actor::class, PerformanceActor::class, 'perf_id', 'actor_id', 'perf_id', 'actor_id');
+        return $this->belongsToMany(Actor::class, 'performance_actors', 'perf_id', 'actor_id');
     }
 
     /**
@@ -45,7 +45,7 @@ class Performance extends Model
      */
     public function perfAddr()
     {
-        return $this->hasOne(Addr::class, 'addr_id', 'perf_address')
+        return $this->hasOne(Addr::class, 'addr_id', 'perf_addr')
                      ->select(['addr_id', 'addr_name']);
     }
 

@@ -166,6 +166,7 @@
                     })
                     .then(res=>{
                         this.$Message.success(res.data.msg)
+                        this.$router.push('/performance')
                         this.changeFlagLogin(true)
                     })
             },

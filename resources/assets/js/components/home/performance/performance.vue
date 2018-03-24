@@ -1,7 +1,12 @@
 <template>
     <div class="module-performance">
-        <Table :loading="loading" :width="tableWidth" border :columns="columns" :data="tableData"></Table>
-
+        <Table :loading="loading" :width="tableWidth" border :columns="columns" :data="tableData" highlight-row
+        @on-current-change="handleRowChange"></Table>
+        <!--分页-->
+        <div class="page">
+            <Page :total="count" :page-size="pageSize" show-elevator
+                  @on-change="pageTurning"></Page>
+        </div>
         <!--演员详情-->
         <Modal
                 v-model="actorDetailFlag"
@@ -26,11 +31,93 @@
             <br>
             <p><b>输出记录</b>：{{perfDetail.perf_output}}</p>
         </Modal>
+        <!--修改-->
+        <Modal
+                v-model="editFlag"
+                title="修改"
+        @on-ok="edit">
+            <Form ref="editForm" :model="editObj"  :label-width="80"
+                  v-if="!!editObj && editObj.perf_type && editObj.perf_troupe && editObj.perf_addr">
+                <FormItem label="演出编号">
+                    <Input type="text" v-model="editObj.perf_code"></Input>
+                </FormItem>
+                <FormItem label="演出日期">
+                    <DatePicker type="datetime" placeholder="Select date and time" style="width: 200px" :value="editObj.perf_date"
+                                @on-change="_selectDateForEdit"></DatePicker>
+                </FormItem>
+                <FormItem label="剧种">
+                    <Select v-model="editObj.perf_type.type_id" style="width:200px">
+                        <Option v-for="(type, index) of types" :value="type.type_id" :key="index">{{ type.type_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="剧团">
+                    <Select v-model="editObj.perf_troupe.troupe_id" style="width:200px">
+                        <Option v-for="(troupe, index) of troupes" :value="troupe.troupe_id" :key="index">{{ troupe.troupe_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="演出地点">
+                    <Select v-model="editObj.perf_addr.addr_id" style="width:200px">
+                        <Option v-for="(addr, index) of addrs" :value="addr.addr_id" :key="index">{{ addr.addr_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="演员">
+                    <Select
+                            v-model="editObj.actors"
+                            :label="editActorsLabel"
+                            filterable
+                            remote
+                            multiple
+                            :remote-method="searchActors"
+                            :loading="fetchActorsLoading"
+                            :loading-text="fetchActorsLoadingText"
+                    >
+                        <Option v-for="(actor, index) of actors" :value="actor.actor_id" :key="index">{{actor.actor_name}}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="选填信息">
+                    <i-switch v-model="editAlterFlag" size="large" @click="_toggleEditAlterFlag">
+                        <span slot="open">On</span>
+                        <span slot="close">Off</span>
+                    </i-switch>
+                </FormItem>
+                <div v-if="editAlterFlag">
+                    <FormItem label="演出内容">
+                        <Input v-model="editObj.perf_content" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
+                    <FormItem label="接收记录">
+                        <Input v-model="editObj.perf_receive" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
+                    <FormItem label="输出记录">
+                        <Input v-model="editObj.perf_output" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
+                    <FormItem label="视频长度">
+                        <Input type="text" v-model="editObj.perf_duration" number></Input>
+                    </FormItem>
+                    <FormItem label="视频大小">
+                        <Input type="text" v-model="editObj.perf_size" number></Input>
+                    </FormItem>
+                </div>
+            </Form>
+        </Modal>
+        <!--删除-->
+        <Modal
+            v-model="deleteFlag"
+            title="删除"
+            @on-ok="destroy">
+            <Alert type="error">确定删除？</Alert>
+        </Modal>
+        <!--新增-->
+        <!--lazy-loading-->
     </div>
 </template>
 
 <script>
     import {mapGetters, mapMutations} from 'vuex'
+    import objUtils from '@utils/objUtils'
+    import httpUtils from '@utils/httpUtils'
+
+    var interval;
+
     export default {
         name: "performance",
         data(){
@@ -48,6 +135,28 @@
                     //演出详情
                     perfDetailFlag: false,
                     perfDetail: {},
+                //分页
+                    count: 0,
+                //修改
+                    editFlag: false,
+                    editAlterFlag: false, //开关选填信息， 太占位置了
+                    editObj: {},
+                    editIndex: 0,
+                //删除
+                    deleteFlag: false,
+                    perfId: "",
+                //获取演员
+                    fetchActorsLoading: false,
+                    fetchActorsLoadingText: `2秒后开始搜索...`,
+                    actors: [],     //存放每次检索后端传来的数据
+                    query: "",
+                    delay: 2000, //延迟时间
+                    still: 2000,  //剩余确认时间
+                    editActorsLabel: [],   //用于存放名字
+                //工具类数据
+                    types: [],
+                    troupes: [],
+                    addrs: [],
                 columns: [
                     {
                         title: '编号',
@@ -83,7 +192,7 @@
                     },
                     {
                         title: '演出地点',
-                        key: 'perf_address',
+                        key: 'perf_addr',
                         width: 100,
                         render: (h, params) => {
                             if(params.row.perf_addr){
@@ -143,22 +252,36 @@
                     },
                     {
                         title: '操作',
-                        width: 150,
+                        width: 180,
                         align: 'center',
                         fixed: 'right',
                         render: (h, params) => {
                             return h('div', [
                                 h('Button', {
                                     props: {
-                                        type: 'primary',
+                                        type: 'warning',
                                         size: 'small'
                                     },
                                     style: {
-                                        marginRight: '5px'
+                                        marginRight: '8px'
                                     },
                                     on: {
                                         click: () => {
 
+                                        }
+                                    }
+                                }, '照片'),
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '8px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.toggleEditModal(params.row, params.index)
                                         }
                                     }
                                 }, '修改'),
@@ -169,7 +292,7 @@
                                     },
                                     on: {
                                         click: () => {
-
+                                            this.toggleDeleteModel(params.row.perf_id)
                                         }
                                     }
                                 }, '删除')
@@ -184,6 +307,20 @@
             this.resetTableWidth()
             //获取数据
             this.fetchData('page')
+            //获取工具数据：剧团、剧种、演出地点
+            setTimeout(()=>{
+                this.fetchBaseData()
+            },1000)
+        },
+        destroyed(){
+            //卸载本地工具类缓存
+            //卸载轮询器
+            clearInterval(interval)
+        },
+        created(){
+          this.$watch('query', httpUtils.debounce((newQuery) => {
+              this.searchActorsDebounce(newQuery)
+          },this.delay))
         },
         computed:{
             ...mapGetters([
@@ -191,6 +328,70 @@
             ])
         },
         methods:{
+            handleRowChange(currentRow, oldCurrentRow){
+                console.log(currentRow)
+                console.log(oldCurrentRow)
+            },
+            //修改
+            toggleEditModal(source, index){
+                    this.editIndex = index
+                    this.editFlag = !this.editFlag
+                    objUtils.deepClone(this.editObj, source)
+                    this._initActorsValue()
+            },
+            //Actor的select组件默认值初始化
+            _initActorsValue(){
+                this.editObj.actors = this.editObj.perf_actors.map(actor=>{
+                    return actor.actor_id
+                })
+                this.editActorsLabel = this.editObj.perf_actors.map(actor=>{
+                    return actor.actor_name
+                })
+            },
+            edit(){
+                let body = {
+                    'perf_id': this.editObj.perf_id,
+                    'perf_code': this.editObj.perf_code,
+                    'perf_date': this.editObj.perf_date,
+                    'perf_type': this.editObj.perf_type.type_id,
+                    'perf_troupe': this.editObj.perf_troupe.troupe_id,
+                    'perf_addr': this.editObj.perf_addr.addr_id,
+                    'perf_content': this.editObj.perf_content,
+                    'perf_receive': this.editObj.perf_receive,
+                    'perf_output': this.editObj.perf_output,
+                    'perf_actors': this.editObj.actors
+                }
+                this.$http
+                    .post(`${this.name}/update`, body)
+                    .then(res=>{
+                        this.$Message.success(res.data.msg)
+                        this.fetchData('page', this.editIndex)
+                    })
+            },
+            _toggleEditAlterFlag(){
+                this.editAlterFlag = !this.editAlterFlag
+            },
+            _selectDateForEdit(date){
+                this.editObj.perf_date = date
+            },
+            //删除
+            toggleDeleteModel(perf_id){
+                this.deleteFlag = !this.deleteFlag
+                this.perfId = perf_id
+            },
+            destroy(){
+                this.$http
+                    .get(`${this.name}/delete/${this.perfId}`)
+                    .then(res=>{
+                        this.$Message.success(res.data.msg)
+                        this.fetchData('page')
+                    })
+            },
+            //翻页
+            pageTurning(page){
+                this.page = page
+                this.fetchData('page')
+            },
             //性别统计
             _countSex(data, sex){
                 return data.filter(item=>{
@@ -208,12 +409,12 @@
             resetTableWidth(){
                 let curComponentWidth = document.querySelectorAll("div[class='module-performance']")[0].clientWidth
                 if(curComponentWidth > 1400){
-                    this.tableWidth = 1250
+                    this.tableWidth = 1280
                 }else{
-                    this.tableWidth = curComponentWidth * 0.8
+                    this.tableWidth = curComponentWidth * 0.82
                 }
             },
-            fetchData(api){
+            fetchData(api, highlight = null){
                 this.loading = true
                 this.$http
                     .post(`${this.name}/${api}`, {
@@ -223,17 +424,71 @@
                     .then(res=>{
                         this.loading = false
                         res = res.data
+                        if(highlight) res.data.data[highlight]._highlight = true;   //是否要高亮某一行
                         this.$Message.success(res.msg)
                         this.setTableData(res.data.data)
+                        this.count = res.data.count
+                    })
+            },
+            //剧种、剧团、地址
+            fetchBaseData(){
+                this.$http
+                    .get(`${this.name}/baseData`)
+                    .then(res=>{
+                        res = res.data.data
+                        this.types = res.types
+                        this.troupes = res.troupes
+                        this.addrs = res.addrs
                     })
             },
             ...mapMutations({
                 setTableData:'SET_TABLE_DATA'
-            })
+            }),
+            //获取演员
+            searchActors(query){
+                if(query !== ""){
+                    this.searchCountDown()
+                    this.fetchActorsLoading = true
+                    this.query = query
+                }
+            },
+            //描述倒计时
+            searchCountDown(){
+                if(interval){
+                    clearInterval(interval)
+                    //并reset
+                    this.still = this.delay
+                }
+                interval = setInterval(()=>{
+                    if(this.still > 0){
+                        this.still = this.still - 100
+                        this.fetchActorsLoadingText = `${this.still/1000}秒后开始搜索`
+                    } else {
+                        this.fetchActorsLoadingText = `已确认`
+                        this.still = this.delay
+                    }
+                }, 100)
+            },
+            //搜索演员（配合watch-debounce）
+            searchActorsDebounce(query){
+                this.$http
+                    .post('/actor/searchActors', {
+                        query
+                    })
+                    .then( res =>{
+                        this.fetchActorsLoading = false
+                        this.actors = this.actors.concat(res.data.data)
+                    }, err=>{
+                        this.fetchActorsLoading = false
+                    })
+            }
         }
     }
 </script>
 
 <style type="text/stylus" rel="stylesheet/stylus" lang="stylus">
-
+    .module-performance
+        .page
+            width 55%
+            margin 28px auto 0 auto
 </style>
