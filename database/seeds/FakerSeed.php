@@ -21,7 +21,7 @@ class FakerSeed extends Seeder
             });
             //todo 每个演出塞5-10个演员
             factory(\App\Model\Perf\PerformanceActor::class, rand(5,10))->make()->each(function ($pactor) use ($perf){
-               $perf->perfActors()->save($pactor);
+               \App\Model\Perf\PerformanceActor::create(['perf_id'=>$perf['perf_id'], 'actor_id'=>$pactor['actor_id']]);
             });
         });
         //todo 创建50个演员

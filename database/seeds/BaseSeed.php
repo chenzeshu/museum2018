@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class CommonSeed extends Seeder
+class BaseSeed extends Seeder
 {
     /**
      * Run the database seeds.
@@ -27,6 +27,11 @@ class CommonSeed extends Seeder
         DB::table('baktypes')->insert([
             ['baktype_name' => '存储器'],
             ['baktype_name' => '硬盘']
+        ]);
+
+        DB::table('records')->insert([
+           'record_type'=>1,
+           'record_number'=>0,
         ]);
     }
 }

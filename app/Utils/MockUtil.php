@@ -9,13 +9,18 @@
 namespace App\Utils;
 
 
+use App\Model\Common\Record;
+
 class MockUtil
 {
     /**
      * @param {string} $year 触发时的年份
      */
     static public function mockGetPerfCode($year){
-        return intval($year + rand(1,999));
+        $record = Record::findOrFail(1);
+        $number = $record->record_number;       //填充时不需要++
+        $record->increment('record_number');
+        return intval($year . $number);
     }
 
     static public function generate_password( $length = 8 ) {

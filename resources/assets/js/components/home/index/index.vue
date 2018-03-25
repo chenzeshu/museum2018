@@ -103,20 +103,12 @@
                     {
                         name: "1",
                         iconType: "ios-navigate",
-                        title:"演员",
+                        title:"演出",
                         menus: [
                             {
                                 name:"1-1",
                                 title:"演出",
                                 path:'/performance'
-                            },
-                            {
-                                name:"1-2",
-                                title:"演出2"
-                            },
-                            {
-                                name:"1-3",
-                                title:"演出3"
                             },
                         ]
                     },

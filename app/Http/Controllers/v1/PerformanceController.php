@@ -19,6 +19,9 @@ class PerformanceController extends CommonController
         $this->dao = $dao;
     }
 
+    /**
+     * 分页获取数据
+     */
     public function page(Request $request)
     {
         $page = $request->page;
@@ -27,6 +30,7 @@ class PerformanceController extends CommonController
         $data = Performance::offset($begin)
             ->limit($pageSize)
             ->with(['perfActors', 'perfDetail', 'perfType', 'perfAddr', 'perfTroupe'])
+            ->orderBy('perf_id', 'desc')
             ->get()
             ->toArray();
         $count = Performance::count();
@@ -53,14 +57,25 @@ class PerformanceController extends CommonController
     }
 
     /**
+     * 新增
+     */
+    public function store(Request $request)
+    {
+        $perf = $this->dao->addPerfSelf($request);
+        $this->dao->addPerfActors($perf, $request);
+        $this->dao->addPerfDetail($perf, $request);
+        return $this->resSuccess('新增成功', []);
+    }
+
+    /**
      * 更新
      */
     public function update(Request $request)
     {
         $perf = Performance::findOrFail($request->perf_id);
-        $re1 = $this->dao->updateActors($perf, $request);
-        $re2 = $this->dao->updateDetail($perf, $request);
-        $re = $this->dao->updateSelf($perf, $request);
+        $re1 = $this->dao->updatePerfActors($perf, $request);
+        $re2 = $this->dao->updatePerfDetail($perf, $request);
+        $re = $this->dao->updatePerfSelf($perf, $request);
         return $re&&$re1&&$re2 ? $this->resSuccess() : $this->resError();
     }
 

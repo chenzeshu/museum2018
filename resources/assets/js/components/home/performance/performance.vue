@@ -1,7 +1,18 @@
 <template>
     <div class="module-performance">
+        <div class="topbar">
+            <div class="topbar-item">
+                <Button type="primary" size="small" class="topbar-item-add" @click="toggleAddModal">
+                    <Icon type="android-add-circle" style="margin-right:8px"></Icon>新增
+                </Button>
+            </div>
+            <div class="topbar-item">
+                数量： <b><h4 style="display:inline-block">{{count}}</h4></b>
+            </div>
+        </div>
+
         <Table :loading="loading" :width="tableWidth" border :columns="columns" :data="tableData" highlight-row
-        @on-current-change="handleRowChange"></Table>
+               style="margin-left:8px"></Table>
         <!--分页-->
         <div class="page">
             <Page :total="count" :page-size="pageSize" show-elevator
@@ -30,6 +41,70 @@
             <p><b>接收记录</b>：{{perfDetail.perf_receive}}</p>
             <br>
             <p><b>输出记录</b>：{{perfDetail.perf_output}}</p>
+        </Modal>
+        <!--新增-->
+        <Modal
+            v-model="addFlag"
+            title="新增"
+            @on-ok="add"
+        >
+            <Form ref="addForm" :model="addObj"  :label-width="80">
+                <FormItem label="演出日期">
+                    <DatePicker type="datetime" placeholder="Select date and time" style="width: 200px" :value="addObj.perf_date"
+                                @on-change="_selectDateForAdd"></DatePicker>
+                </FormItem>
+                <FormItem label="剧种">
+                    <Select v-model="addObj.perf_type.type_id" style="width:200px">
+                        <Option v-for="(type, index) of types" :value="type.type_id" :key="index">{{ type.type_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="剧团">
+                    <Select v-model="addObj.perf_troupe.troupe_id" style="width:200px">
+                        <Option v-for="(troupe, index) of troupes" :value="troupe.troupe_id" :key="index">{{ troupe.troupe_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="演出地点">
+                    <Select v-model="addObj.perf_addr.addr_id" style="width:200px">
+                        <Option v-for="(addr, index) of addrs" :value="addr.addr_id" :key="index">{{ addr.addr_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="演员">
+                    <Select
+                            v-model="addObj.perf_actors"
+                            filterable
+                            remote
+                            multiple
+                            :remote-method="searchActors"
+                            :loading="fetchActorsLoading"
+                            :loading-text="fetchActorsLoadingText"
+                    >
+                        <Option v-for="(actor, index) of actors" :value="actor.actor_id" :key="index">{{actor.actor_name}}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="选填信息">
+                    <i-switch v-model="addAlterFlag" size="large" @click="_toggleAddAlterFlag">
+                        <span slot="open">On</span>
+                        <span slot="close">Off</span>
+                    </i-switch>
+                </FormItem>
+                <div v-if="addAlterFlag">
+                    <FormItem label="演出内容">
+                        <Input v-model="addObj.perf_content" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
+                    <FormItem label="接收记录">
+                        <Input v-model="addObj.perf_receive" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
+                    <FormItem label="输出记录">
+                        <Input v-model="addObj.perf_output" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
+                    <FormItem label="视频长度">
+                        <Input type="text" v-model="addObj.perf_duration" number></Input>
+                    </FormItem>
+                    <FormItem label="视频大小">
+                        <Input type="text" v-model="addObj.perf_size" number></Input>
+                    </FormItem>
+                </div>
+            </Form>
         </Modal>
         <!--修改-->
         <Modal
@@ -106,7 +181,7 @@
             @on-ok="destroy">
             <Alert type="error">确定删除？</Alert>
         </Modal>
-        <!--新增-->
+
         <!--lazy-loading-->
     </div>
 </template>
@@ -117,7 +192,6 @@
     import httpUtils from '@utils/httpUtils'
 
     var interval;
-
     export default {
         name: "performance",
         data(){
@@ -137,6 +211,10 @@
                     perfDetail: {},
                 //分页
                     count: 0,
+                //新增
+                    addFlag: false,
+                    addAlterFlag: false,
+                    addObj: this._resetAddObj(),
                 //修改
                     editFlag: false,
                     editAlterFlag: false, //开关选填信息， 太占位置了
@@ -328,9 +406,44 @@
             ])
         },
         methods:{
-            handleRowChange(currentRow, oldCurrentRow){
-                console.log(currentRow)
-                console.log(oldCurrentRow)
+            //增加
+            toggleAddModal(){
+                this.addFlag = !this.addFlag
+            },
+            _toggleAddAlterFlag(){
+              this.addAlterFlag = !this.addAlterFlag
+            },
+            _selectDateForAdd(v){
+                this.addObj.perf_date = v
+            },
+            add(){
+                let body = this._pakAddBody()
+                this.$http
+                    .post(`${this.name}/store`, body)
+                    .then(res=>{
+                        this.$Message.success(res.data.msg)
+                        this.page = 1               //无论在哪一页新增，都会回到最初的那页
+                        this.fetchData('page', 0)   //新增的总是在最上面出现
+                    })
+            },
+            //组装add的通讯用的body
+            _pakAddBody(){
+                let body = {}
+                objUtils.deepClone(body, this.addObj)
+                body.perf_addr = body.perf_addr.addr_id
+                body.perf_troupe = body.perf_troupe.troupe_id
+                body.perf_type = body.perf_type.type_id
+                this.addObj = this._resetAddObj()
+                return body
+            },
+            //addObj重置，复用在data定义和http通讯两个地方
+            _resetAddObj(){
+                return {
+                    perf_troupe: {troupe_id:""},
+                    perf_type:{type_id:""},
+                    perf_addr:{addr_id:""},
+                    perf_actors: []
+                }
             },
             //修改
             toggleEditModal(source, index){
@@ -338,6 +451,9 @@
                     this.editFlag = !this.editFlag
                     objUtils.deepClone(this.editObj, source)
                     this._initActorsValue()
+            },
+            _toggleEditAlterFlag(){
+                this.editAlterFlag = !this.editAlterFlag
             },
             //Actor的select组件默认值初始化
             _initActorsValue(){
@@ -367,9 +483,6 @@
                         this.$Message.success(res.data.msg)
                         this.fetchData('page', this.editIndex)
                     })
-            },
-            _toggleEditAlterFlag(){
-                this.editAlterFlag = !this.editAlterFlag
             },
             _selectDateForEdit(date){
                 this.editObj.perf_date = date
@@ -407,11 +520,11 @@
                 this.perfDetail = data
             },
             resetTableWidth(){
-                let curComponentWidth = document.querySelectorAll("div[class='module-performance']")[0].clientWidth
+                let curComponentWidth = document.querySelectorAll("div[class='ivu-layout-content']")[0].clientWidth
                 if(curComponentWidth > 1400){
                     this.tableWidth = 1280
                 }else{
-                    this.tableWidth = curComponentWidth * 0.82
+                    this.tableWidth = curComponentWidth *0.8
                 }
             },
             fetchData(api, highlight = null){
@@ -424,7 +537,7 @@
                     .then(res=>{
                         this.loading = false
                         res = res.data
-                        if(highlight) res.data.data[highlight]._highlight = true;   //是否要高亮某一行
+                        if(highlight || highlight === 0) res.data.data[highlight]._highlight = true;   //是否要高亮某一行 注意第0行不要被当成null...
                         this.$Message.success(res.msg)
                         this.setTableData(res.data.data)
                         this.count = res.data.count
@@ -488,6 +601,18 @@
 
 <style type="text/stylus" rel="stylesheet/stylus" lang="stylus">
     .module-performance
+        .topbar
+            height 32px
+            margin 8px 0;
+            padding-left 16px
+            display flex
+            flex-direction row
+            justify-content:baseline
+            align-items center
+            .topbar-item
+                width 120px
+                .topbar-item-add
+                    width 60%
         .page
             width 55%
             margin 28px auto 0 auto

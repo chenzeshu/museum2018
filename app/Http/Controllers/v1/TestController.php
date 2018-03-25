@@ -10,7 +10,7 @@ class TestController extends Controller
 {
     public function test()
     {
-        $data = Performance::findOrFail(1)->actors()->get();
+        $data = config("app.record.performance");
         return $data;
     }
 }

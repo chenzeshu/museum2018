@@ -5604,7 +5604,7 @@ exports = module.exports = __webpack_require__(1)(false);
 
 
 // module
-exports.push([module.i, "\n.module-performance .page {\n  width: 55%;\n  margin: 28px auto 0 auto;\n}\n", ""]);
+exports.push([module.i, "\n.module-performance .topbar {\n  height: 32px;\n  margin: 8px 0;\n  padding-left: 16px;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: row;\n          flex-direction: row;\n  -webkit-box-pack: baseline;\n      -ms-flex-pack: baseline;\n          justify-content: baseline;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.module-performance .topbar .topbar-item {\n  width: 120px;\n}\n.module-performance .topbar .topbar-item .topbar-item-add {\n  width: 60%;\n}\n.module-performance .page {\n  width: 55%;\n  margin: 28px auto 0 auto;\n}\n", ""]);
 
 // exports
 
@@ -5766,13 +5766,87 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
 
 
 var interval;
-
 /* harmony default export */ __webpack_exports__["default"] = ({
     name: "performance",
     data: function data() {
@@ -5794,6 +5868,10 @@ var interval;
             perfDetail: {},
             //分页
             count: 0,
+            //新增
+            addFlag: false,
+            addAlterFlag: false,
+            addObj: this._resetAddObj(),
             //修改
             editFlag: false,
             editAlterFlag: false, //开关选填信息， 太占位置了
@@ -5969,9 +6047,46 @@ var interval;
 
     computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["b" /* mapGetters */])(['tableData'])),
     methods: _extends({
-        handleRowChange: function handleRowChange(currentRow, oldCurrentRow) {
-            console.log(currentRow);
-            console.log(oldCurrentRow);
+        //增加
+        toggleAddModal: function toggleAddModal() {
+            this.addFlag = !this.addFlag;
+        },
+        _toggleAddAlterFlag: function _toggleAddAlterFlag() {
+            this.addAlterFlag = !this.addAlterFlag;
+        },
+        _selectDateForAdd: function _selectDateForAdd(v) {
+            this.addObj.perf_date = v;
+        },
+        add: function add() {
+            var _this4 = this;
+
+            var body = this._pakAddBody();
+            this.$http.post(this.name + '/store', body).then(function (res) {
+                _this4.$Message.success(res.data.msg);
+                _this4.page = 1; //无论在哪一页新增，都会回到最初的那页
+                _this4.fetchData('page', 0); //新增的总是在最上面出现
+            });
+        },
+
+        //组装add的通讯用的body
+        _pakAddBody: function _pakAddBody() {
+            var body = {};
+            __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__["a" /* default */].deepClone(body, this.addObj);
+            body.perf_addr = body.perf_addr.addr_id;
+            body.perf_troupe = body.perf_troupe.troupe_id;
+            body.perf_type = body.perf_type.type_id;
+            this.addObj = this._resetAddObj();
+            return body;
+        },
+
+        //addObj重置，复用在data定义和http通讯两个地方
+        _resetAddObj: function _resetAddObj() {
+            return {
+                perf_troupe: { troupe_id: "" },
+                perf_type: { type_id: "" },
+                perf_addr: { addr_id: "" },
+                perf_actors: []
+            };
         },
 
         //修改
@@ -5980,6 +6095,9 @@ var interval;
             this.editFlag = !this.editFlag;
             __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__["a" /* default */].deepClone(this.editObj, source);
             this._initActorsValue();
+        },
+        _toggleEditAlterFlag: function _toggleEditAlterFlag() {
+            this.editAlterFlag = !this.editAlterFlag;
         },
 
         //Actor的select组件默认值初始化
@@ -5992,7 +6110,7 @@ var interval;
             });
         },
         edit: function edit() {
-            var _this4 = this;
+            var _this5 = this;
 
             var body = {
                 'perf_id': this.editObj.perf_id,
@@ -6007,12 +6125,9 @@ var interval;
                 'perf_actors': this.editObj.actors
             };
             this.$http.post(this.name + '/update', body).then(function (res) {
-                _this4.$Message.success(res.data.msg);
-                _this4.fetchData('page', _this4.editIndex);
+                _this5.$Message.success(res.data.msg);
+                _this5.fetchData('page', _this5.editIndex);
             });
-        },
-        _toggleEditAlterFlag: function _toggleEditAlterFlag() {
-            this.editAlterFlag = !this.editAlterFlag;
         },
         _selectDateForEdit: function _selectDateForEdit(date) {
             this.editObj.perf_date = date;
@@ -6024,11 +6139,11 @@ var interval;
             this.perfId = perf_id;
         },
         destroy: function destroy() {
-            var _this5 = this;
+            var _this6 = this;
 
             this.$http.get(this.name + '/delete/' + this.perfId).then(function (res) {
-                _this5.$Message.success(res.data.msg);
-                _this5.fetchData('page');
+                _this6.$Message.success(res.data.msg);
+                _this6.fetchData('page');
             });
         },
 
@@ -6053,15 +6168,15 @@ var interval;
             this.perfDetail = data;
         },
         resetTableWidth: function resetTableWidth() {
-            var curComponentWidth = document.querySelectorAll("div[class='module-performance']")[0].clientWidth;
+            var curComponentWidth = document.querySelectorAll("div[class='ivu-layout-content']")[0].clientWidth;
             if (curComponentWidth > 1400) {
                 this.tableWidth = 1280;
             } else {
-                this.tableWidth = curComponentWidth * 0.82;
+                this.tableWidth = curComponentWidth * 0.8;
             }
         },
         fetchData: function fetchData(api) {
-            var _this6 = this;
+            var _this7 = this;
 
             var highlight = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
@@ -6070,24 +6185,24 @@ var interval;
                 page: this.page,
                 pageSize: this.pageSize
             }).then(function (res) {
-                _this6.loading = false;
+                _this7.loading = false;
                 res = res.data;
-                if (highlight) res.data.data[highlight]._highlight = true; //是否要高亮某一行
-                _this6.$Message.success(res.msg);
-                _this6.setTableData(res.data.data);
-                _this6.count = res.data.count;
+                if (highlight || highlight === 0) res.data.data[highlight]._highlight = true; //是否要高亮某一行 注意第0行不要被当成null...
+                _this7.$Message.success(res.msg);
+                _this7.setTableData(res.data.data);
+                _this7.count = res.data.count;
             });
         },
 
         //剧种、剧团、地址
         fetchBaseData: function fetchBaseData() {
-            var _this7 = this;
+            var _this8 = this;
 
             this.$http.get(this.name + '/baseData').then(function (res) {
                 res = res.data.data;
-                _this7.types = res.types;
-                _this7.troupes = res.troupes;
-                _this7.addrs = res.addrs;
+                _this8.types = res.types;
+                _this8.troupes = res.troupes;
+                _this8.addrs = res.addrs;
             });
         }
     }, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["c" /* mapMutations */])({
@@ -6104,7 +6219,7 @@ var interval;
 
         //描述倒计时
         searchCountDown: function searchCountDown() {
-            var _this8 = this;
+            var _this9 = this;
 
             if (interval) {
                 clearInterval(interval);
@@ -6112,27 +6227,27 @@ var interval;
                 this.still = this.delay;
             }
             interval = setInterval(function () {
-                if (_this8.still > 0) {
-                    _this8.still = _this8.still - 100;
-                    _this8.fetchActorsLoadingText = _this8.still / 1000 + '\u79D2\u540E\u5F00\u59CB\u641C\u7D22';
+                if (_this9.still > 0) {
+                    _this9.still = _this9.still - 100;
+                    _this9.fetchActorsLoadingText = _this9.still / 1000 + '\u79D2\u540E\u5F00\u59CB\u641C\u7D22';
                 } else {
-                    _this8.fetchActorsLoadingText = '\u5DF2\u786E\u8BA4';
-                    _this8.still = _this8.delay;
+                    _this9.fetchActorsLoadingText = '\u5DF2\u786E\u8BA4';
+                    _this9.still = _this9.delay;
                 }
             }, 100);
         },
 
         //搜索演员（配合watch-debounce）
         searchActorsDebounce: function searchActorsDebounce(query) {
-            var _this9 = this;
+            var _this10 = this;
 
             this.$http.post('/actor/searchActors', {
                 query: query
             }).then(function (res) {
-                _this9.fetchActorsLoading = false;
-                _this9.actors = _this9.actors.concat(res.data.data);
+                _this10.fetchActorsLoading = false;
+                _this10.actors = _this10.actors.concat(res.data.data);
             }, function (err) {
-                _this9.fetchActorsLoading = false;
+                _this10.fetchActorsLoading = false;
             });
         }
     })
@@ -6217,7 +6332,43 @@ var render = function() {
     "div",
     { staticClass: "module-performance" },
     [
+      _c("div", { staticClass: "topbar" }, [
+        _c(
+          "div",
+          { staticClass: "topbar-item" },
+          [
+            _c(
+              "Button",
+              {
+                staticClass: "topbar-item-add",
+                attrs: { type: "primary", size: "small" },
+                on: { click: _vm.toggleAddModal }
+              },
+              [
+                _c("Icon", {
+                  staticStyle: { "margin-right": "8px" },
+                  attrs: { type: "android-add-circle" }
+                }),
+                _vm._v("新增\n            ")
+              ],
+              1
+            )
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "topbar-item" }, [
+          _vm._v("\n            数量： "),
+          _c("b", [
+            _c("h4", { staticStyle: { display: "inline-block" } }, [
+              _vm._v(_vm._s(_vm.count))
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
       _c("Table", {
+        staticStyle: { "margin-left": "8px" },
         attrs: {
           loading: _vm.loading,
           width: _vm.tableWidth,
@@ -6225,8 +6376,7 @@ var render = function() {
           columns: _vm.columns,
           data: _vm.tableData,
           "highlight-row": ""
-        },
-        on: { "on-current-change": _vm.handleRowChange }
+        }
       }),
       _vm._v(" "),
       _c(
@@ -6330,6 +6480,307 @@ var render = function() {
             _vm._v("：" + _vm._s(_vm.perfDetail.perf_output))
           ])
         ]
+      ),
+      _vm._v(" "),
+      _c(
+        "Modal",
+        {
+          attrs: { title: "新增" },
+          on: { "on-ok": _vm.add },
+          model: {
+            value: _vm.addFlag,
+            callback: function($$v) {
+              _vm.addFlag = $$v
+            },
+            expression: "addFlag"
+          }
+        },
+        [
+          _c(
+            "Form",
+            { ref: "addForm", attrs: { model: _vm.addObj, "label-width": 80 } },
+            [
+              _c(
+                "FormItem",
+                { attrs: { label: "演出日期" } },
+                [
+                  _c("DatePicker", {
+                    staticStyle: { width: "200px" },
+                    attrs: {
+                      type: "datetime",
+                      placeholder: "Select date and time",
+                      value: _vm.addObj.perf_date
+                    },
+                    on: { "on-change": _vm._selectDateForAdd }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "FormItem",
+                { attrs: { label: "剧种" } },
+                [
+                  _c(
+                    "Select",
+                    {
+                      staticStyle: { width: "200px" },
+                      model: {
+                        value: _vm.addObj.perf_type.type_id,
+                        callback: function($$v) {
+                          _vm.$set(_vm.addObj.perf_type, "type_id", $$v)
+                        },
+                        expression: "addObj.perf_type.type_id"
+                      }
+                    },
+                    _vm._l(_vm.types, function(type, index) {
+                      return _c(
+                        "Option",
+                        { key: index, attrs: { value: type.type_id } },
+                        [_vm._v(_vm._s(type.type_name))]
+                      )
+                    })
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "FormItem",
+                { attrs: { label: "剧团" } },
+                [
+                  _c(
+                    "Select",
+                    {
+                      staticStyle: { width: "200px" },
+                      model: {
+                        value: _vm.addObj.perf_troupe.troupe_id,
+                        callback: function($$v) {
+                          _vm.$set(_vm.addObj.perf_troupe, "troupe_id", $$v)
+                        },
+                        expression: "addObj.perf_troupe.troupe_id"
+                      }
+                    },
+                    _vm._l(_vm.troupes, function(troupe, index) {
+                      return _c(
+                        "Option",
+                        { key: index, attrs: { value: troupe.troupe_id } },
+                        [_vm._v(_vm._s(troupe.troupe_name))]
+                      )
+                    })
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "FormItem",
+                { attrs: { label: "演出地点" } },
+                [
+                  _c(
+                    "Select",
+                    {
+                      staticStyle: { width: "200px" },
+                      model: {
+                        value: _vm.addObj.perf_addr.addr_id,
+                        callback: function($$v) {
+                          _vm.$set(_vm.addObj.perf_addr, "addr_id", $$v)
+                        },
+                        expression: "addObj.perf_addr.addr_id"
+                      }
+                    },
+                    _vm._l(_vm.addrs, function(addr, index) {
+                      return _c(
+                        "Option",
+                        { key: index, attrs: { value: addr.addr_id } },
+                        [_vm._v(_vm._s(addr.addr_name))]
+                      )
+                    })
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "FormItem",
+                { attrs: { label: "演员" } },
+                [
+                  _c(
+                    "Select",
+                    {
+                      attrs: {
+                        filterable: "",
+                        remote: "",
+                        multiple: "",
+                        "remote-method": _vm.searchActors,
+                        loading: _vm.fetchActorsLoading,
+                        "loading-text": _vm.fetchActorsLoadingText
+                      },
+                      model: {
+                        value: _vm.addObj.perf_actors,
+                        callback: function($$v) {
+                          _vm.$set(_vm.addObj, "perf_actors", $$v)
+                        },
+                        expression: "addObj.perf_actors"
+                      }
+                    },
+                    _vm._l(_vm.actors, function(actor, index) {
+                      return _c(
+                        "Option",
+                        { key: index, attrs: { value: actor.actor_id } },
+                        [_vm._v(_vm._s(actor.actor_name))]
+                      )
+                    })
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "FormItem",
+                { attrs: { label: "选填信息" } },
+                [
+                  _c(
+                    "i-switch",
+                    {
+                      attrs: { size: "large" },
+                      on: { click: _vm._toggleAddAlterFlag },
+                      model: {
+                        value: _vm.addAlterFlag,
+                        callback: function($$v) {
+                          _vm.addAlterFlag = $$v
+                        },
+                        expression: "addAlterFlag"
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { slot: "open" }, slot: "open" }, [
+                        _vm._v("On")
+                      ]),
+                      _vm._v(" "),
+                      _c("span", { attrs: { slot: "close" }, slot: "close" }, [
+                        _vm._v("Off")
+                      ])
+                    ]
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _vm.addAlterFlag
+                ? _c(
+                    "div",
+                    [
+                      _c(
+                        "FormItem",
+                        { attrs: { label: "演出内容" } },
+                        [
+                          _c("Input", {
+                            attrs: {
+                              type: "textarea",
+                              autosize: { minRows: 2, maxRows: 5 },
+                              placeholder: "写点什么..."
+                            },
+                            model: {
+                              value: _vm.addObj.perf_content,
+                              callback: function($$v) {
+                                _vm.$set(_vm.addObj, "perf_content", $$v)
+                              },
+                              expression: "addObj.perf_content"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "FormItem",
+                        { attrs: { label: "接收记录" } },
+                        [
+                          _c("Input", {
+                            attrs: {
+                              type: "textarea",
+                              autosize: { minRows: 2, maxRows: 5 },
+                              placeholder: "写点什么..."
+                            },
+                            model: {
+                              value: _vm.addObj.perf_receive,
+                              callback: function($$v) {
+                                _vm.$set(_vm.addObj, "perf_receive", $$v)
+                              },
+                              expression: "addObj.perf_receive"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "FormItem",
+                        { attrs: { label: "输出记录" } },
+                        [
+                          _c("Input", {
+                            attrs: {
+                              type: "textarea",
+                              autosize: { minRows: 2, maxRows: 5 },
+                              placeholder: "写点什么..."
+                            },
+                            model: {
+                              value: _vm.addObj.perf_output,
+                              callback: function($$v) {
+                                _vm.$set(_vm.addObj, "perf_output", $$v)
+                              },
+                              expression: "addObj.perf_output"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "FormItem",
+                        { attrs: { label: "视频长度" } },
+                        [
+                          _c("Input", {
+                            attrs: { type: "text", number: "" },
+                            model: {
+                              value: _vm.addObj.perf_duration,
+                              callback: function($$v) {
+                                _vm.$set(_vm.addObj, "perf_duration", $$v)
+                              },
+                              expression: "addObj.perf_duration"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "FormItem",
+                        { attrs: { label: "视频大小" } },
+                        [
+                          _c("Input", {
+                            attrs: { type: "text", number: "" },
+                            model: {
+                              value: _vm.addObj.perf_size,
+                              callback: function($$v) {
+                                _vm.$set(_vm.addObj, "perf_size", $$v)
+                              },
+                              expression: "addObj.perf_size"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e()
+            ],
+            1
+          )
+        ],
+        1
       ),
       _vm._v(" "),
       _c(
@@ -6853,17 +7304,11 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
             catalogs: [{
                 name: "1",
                 iconType: "ios-navigate",
-                title: "演员",
+                title: "演出",
                 menus: [{
                     name: "1-1",
                     title: "演出",
                     path: '/performance'
-                }, {
-                    name: "1-2",
-                    title: "演出2"
-                }, {
-                    name: "1-3",
-                    title: "演出3"
                 }]
             }, {
                 name: "2",

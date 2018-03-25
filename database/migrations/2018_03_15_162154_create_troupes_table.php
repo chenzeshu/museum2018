@@ -42,6 +42,14 @@ class CreateTroupesTable extends Migration
             $table->string('addr_name',60)->comment('演出地点');
             $table->timestamps();
         });
+
+        //序号记录表
+        Schema::create('records', function (Blueprint $table) {
+            $table->increments('record_id');
+            $table->unsignedTinyInteger('record_type')->unique()->default(0)->comment("0:演出");
+            $table->unsignedInteger('record_number')->default(0)->comment('记录当前的序号，不包括年');   //每年重置这个表
+            $table->timestamps();
+        });
     }
 
     /**
@@ -55,5 +63,6 @@ class CreateTroupesTable extends Migration
         Schema::dropIfExists('types');
         Schema::dropIfExists('baktypes');
         Schema::dropIfExists('addrs');
+        Schema::dropIfExists('records');
     }
 }
