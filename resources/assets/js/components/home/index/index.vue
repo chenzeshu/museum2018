@@ -18,7 +18,7 @@
                         </template>
                         <MenuItem :name="menu.name" v-for="(menu, menuIndex) of catalog.menus" :key="menuIndex"
                                   @click.native="navigateTo(menu.path)">
-                            {{menu.title}}
+                            <Icon :type="menu.icon" v-if="menu.icon" class="menu-icon" ></Icon>{{menu.title}}
                         </MenuItem>
                     </Submenu>
                 </Menu>
@@ -80,6 +80,12 @@
         transition: font-size .2s ease, transform .2s ease;
         vertical-align: middle;
         font-size: 16px;
+    .menu-item .menu-icon
+        display inline-block
+        width 16px
+        text-align center
+        margin-right:5px
+        margin-bottom:2px
     .collapsed-menu span
         width: 0px;
         transition: width .2s ease;
@@ -93,80 +99,14 @@
 <script>
     import {mapGetters, mapMutations} from 'vuex'
     import storage from 'good-storage'
+    import {catalogs} from './catalogs'
     export default {
         data () {
             return {
                 isCollapsed: false, //是否横向折叠
                 activeName: "1-1",
                 openNames: ['1'],
-                catalogs: [
-                    {
-                        name: "1",
-                        iconType: "ios-navigate",
-                        title:"演出",
-                        menus: [
-                            {
-                                name:"1-1",
-                                title:"演出",
-                                path:'/performance'
-                            },
-                        ]
-                    },
-                    {
-                        name: "2",
-                        iconType: "ios-navigate",
-                        title:"演员",
-                        menus: [
-                            {
-                                name:"2-1",
-                                title:"演员",
-                                path:'/actor'
-                            },
-                            {
-                                name:"2-2",
-                                title:"foo"
-                            },
-                            {
-                                name:"2-3",
-                                title:"bar"
-                            },
-                        ]
-                    },
-                    {
-                        name: "3",
-                        iconType: "ios-navigate",
-                        title:"其他",
-                        menus: [
-                            {
-                                name:"3-1",
-                                title:"剧团"
-                            },
-                            {
-                                name:"3-2",
-                                title:"剧种"
-                            },
-                            {
-                                name:"3-3",
-                                title:"演出地点"
-                            },
-                            {
-                                name:"3-4",
-                                title:"备份类型"
-                            },
-                        ]
-                    },
-                    {
-                        name: "4",
-                        iconType: "ios-navigate",
-                        title:"平台",
-                        menus: [
-                            {
-                                name:"4-1",
-                                title:"用户表"
-                            },
-                        ]
-                    },
-                ]
+                catalogs: catalogs
             }
         },
         computed: {
@@ -210,6 +150,6 @@
             ...mapMutations({
                 changeFlagLogin: 'CHANGE_FLAG_LOGIN'
             })
-        }
+        },
     }
 </script>

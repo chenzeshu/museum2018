@@ -428,8 +428,7 @@
             },
             //组装add的通讯用的body
             _pakAddBody(){
-                let body = {}
-                objUtils.deepClone(body, this.addObj)
+                let body = objUtils.deepClone(this.addObj)
                 body.perf_addr = body.perf_addr.addr_id
                 body.perf_troupe = body.perf_troupe.troupe_id
                 body.perf_type = body.perf_type.type_id
@@ -449,7 +448,7 @@
             toggleEditModal(source, index){
                     this.editIndex = index
                     this.editFlag = !this.editFlag
-                    objUtils.deepClone(this.editObj, source)
+                    this.editObj = objUtils.deepClone(source)
                     this._initActorsValue()
             },
             _toggleEditAlterFlag(){
@@ -465,24 +464,26 @@
                 })
             },
             edit(){
-                let body = {
-                    'perf_id': this.editObj.perf_id,
-                    'perf_code': this.editObj.perf_code,
-                    'perf_date': this.editObj.perf_date,
-                    'perf_type': this.editObj.perf_type.type_id,
-                    'perf_troupe': this.editObj.perf_troupe.troupe_id,
-                    'perf_addr': this.editObj.perf_addr.addr_id,
-                    'perf_content': this.editObj.perf_content,
-                    'perf_receive': this.editObj.perf_receive,
-                    'perf_output': this.editObj.perf_output,
-                    'perf_actors': this.editObj.actors
-                }
+                let body = this._pakEditBody()
                 this.$http
                     .post(`${this.name}/update`, body)
                     .then(res=>{
                         this.$Message.success(res.data.msg)
                         this.fetchData('page', this.editIndex)
                     })
+            },
+            _pakEditBody(){
+                let body = objUtils.deepClone(this.editObj),
+                    deleteKeyArr = ['perf_detail', '_index', '_rowKey', 'actors']
+                    Reflect.set(body, 'perf_actors', body.actors)
+                    Reflect.set(body, 'perf_type', body.perf_type.type_id)
+                    Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id)
+                    Reflect.set(body, 'perf_addr', body.perf_addr.addr_id)
+
+                    deleteKeyArr.forEach(key => {
+                        Reflect.deleteProperty(body, key)
+                    })
+                    return body
             },
             _selectDateForEdit(date){
                 this.editObj.perf_date = date

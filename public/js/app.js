@@ -6070,8 +6070,7 @@ var interval;
 
         //组装add的通讯用的body
         _pakAddBody: function _pakAddBody() {
-            var body = {};
-            __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__["a" /* default */].deepClone(body, this.addObj);
+            var body = __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__["a" /* default */].deepClone(this.addObj);
             body.perf_addr = body.perf_addr.addr_id;
             body.perf_troupe = body.perf_troupe.troupe_id;
             body.perf_type = body.perf_type.type_id;
@@ -6093,7 +6092,7 @@ var interval;
         toggleEditModal: function toggleEditModal(source, index) {
             this.editIndex = index;
             this.editFlag = !this.editFlag;
-            __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__["a" /* default */].deepClone(this.editObj, source);
+            this.editObj = __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__["a" /* default */].deepClone(source);
             this._initActorsValue();
         },
         _toggleEditAlterFlag: function _toggleEditAlterFlag() {
@@ -6112,22 +6111,24 @@ var interval;
         edit: function edit() {
             var _this5 = this;
 
-            var body = {
-                'perf_id': this.editObj.perf_id,
-                'perf_code': this.editObj.perf_code,
-                'perf_date': this.editObj.perf_date,
-                'perf_type': this.editObj.perf_type.type_id,
-                'perf_troupe': this.editObj.perf_troupe.troupe_id,
-                'perf_addr': this.editObj.perf_addr.addr_id,
-                'perf_content': this.editObj.perf_content,
-                'perf_receive': this.editObj.perf_receive,
-                'perf_output': this.editObj.perf_output,
-                'perf_actors': this.editObj.actors
-            };
+            var body = this._pakEditBody();
             this.$http.post(this.name + '/update', body).then(function (res) {
                 _this5.$Message.success(res.data.msg);
                 _this5.fetchData('page', _this5.editIndex);
             });
+        },
+        _pakEditBody: function _pakEditBody() {
+            var body = __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__["a" /* default */].deepClone(this.editObj),
+                deleteKeyArr = ['perf_detail', '_index', '_rowKey', 'actors'];
+            Reflect.set(body, 'perf_actors', body.actors);
+            Reflect.set(body, 'perf_type', body.perf_type.type_id);
+            Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id);
+            Reflect.set(body, 'perf_addr', body.perf_addr.addr_id);
+
+            deleteKeyArr.forEach(function (key) {
+                Reflect.deleteProperty(body, key);
+            });
+            return body;
         },
         _selectDateForEdit: function _selectDateForEdit(date) {
             this.editObj.perf_date = date;
@@ -6259,35 +6260,9 @@ var interval;
 
 "use strict";
 //深拷贝
-var deepClone = function deepClone(target, source) {
-    var _iteratorNormalCompletion = true;
-    var _didIteratorError = false;
-    var _iteratorError = undefined;
-
-    try {
-        for (var _iterator = Reflect.ownKeys(source)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var key = _step.value;
-
-            if (key !== 'constructor' && key !== 'prototype' && key !== 'name') {
-                //不希望拷贝构造函数、显式原型及类名
-                var desc = Object.getOwnPropertyDescriptor(source, key); //从原对象上拿到函数明文
-                Object.defineProperty(target, key, desc); //像target上赋 key:desc
-            }
-        }
-    } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-    } finally {
-        try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-            }
-        } finally {
-            if (_didIteratorError) {
-                throw _iteratorError;
-            }
-        }
-    }
+var deepClone = function deepClone(oldValue) {
+    var strValue = JSON.stringify(oldValue);
+    return JSON.parse(strValue);
 };
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -7184,7 +7159,7 @@ exports = module.exports = __webpack_require__(1)(false);
 
 
 // module
-exports.push([module.i, "\n.layout {\n  border: 1px solid #d7dde4;\n  background: #f5f7f9;\n  position: relative;\n  border-radius: 4px;\n  overflow: hidden;\n}\n.topbar-right {\n  position: fixed;\n  left: 254px;\n  top: 20px;\n  width: 200px;\n  height: 32px;\n  font-size: 18px;\n  cursor: pointer;\n}\n.topbar-right .topbar-right-logout:hover {\n  color: #0084ff;\n}\n.layout-header-bar {\n  background: #fff;\n  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.1);\n          box-shadow: 0 1px 1px rgba(0,0,0,0.1);\n}\n.layout-logo-left {\n  width: 90%;\n  height: 30px;\n  background: #5b6270;\n  border-radius: 3px;\n  margin: 15px auto;\n}\n.menu-icon {\n  -webkit-transition: all 0.3s;\n  transition: all 0.3s;\n}\n.rotate-icon {\n  -webkit-transform: rotate(-90deg);\n          transform: rotate(-90deg);\n}\n.menu-item span {\n  display: inline-block;\n  overflow: hidden;\n  width: 69px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  vertical-align: bottom;\n  -webkit-transition: width 0.2s ease 0.2s;\n  transition: width 0.2s ease 0.2s;\n}\n.menu-item i {\n  -webkit-transform: translateX(0px);\n          transform: translateX(0px);\n  -webkit-transition: font-size 0.2s ease, -webkit-transform 0.2s ease;\n  transition: font-size 0.2s ease, -webkit-transform 0.2s ease;\n  transition: font-size 0.2s ease, transform 0.2s ease;\n  transition: font-size 0.2s ease, transform 0.2s ease, -webkit-transform 0.2s ease;\n  vertical-align: middle;\n  font-size: 16px;\n}\n.collapsed-menu span {\n  width: 0px;\n  -webkit-transition: width 0.2s ease;\n  transition: width 0.2s ease;\n}\n.collapsed-menu i {\n  -webkit-transform: translateX(5px);\n          transform: translateX(5px);\n  -webkit-transition: font-size 0.2s ease 0.2s, -webkit-transform 0.2s ease 0.2s;\n  transition: font-size 0.2s ease 0.2s, -webkit-transform 0.2s ease 0.2s;\n  transition: font-size 0.2s ease 0.2s, transform 0.2s ease 0.2s;\n  transition: font-size 0.2s ease 0.2s, transform 0.2s ease 0.2s, -webkit-transform 0.2s ease 0.2s;\n  vertical-align: middle;\n  font-size: 22px;\n}\n", ""]);
+exports.push([module.i, "\n.layout {\n  border: 1px solid #d7dde4;\n  background: #f5f7f9;\n  position: relative;\n  border-radius: 4px;\n  overflow: hidden;\n}\n.topbar-right {\n  position: fixed;\n  left: 254px;\n  top: 20px;\n  width: 200px;\n  height: 32px;\n  font-size: 18px;\n  cursor: pointer;\n}\n.topbar-right .topbar-right-logout:hover {\n  color: #0084ff;\n}\n.layout-header-bar {\n  background: #fff;\n  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.1);\n          box-shadow: 0 1px 1px rgba(0,0,0,0.1);\n}\n.layout-logo-left {\n  width: 90%;\n  height: 30px;\n  background: #5b6270;\n  border-radius: 3px;\n  margin: 15px auto;\n}\n.menu-icon {\n  -webkit-transition: all 0.3s;\n  transition: all 0.3s;\n}\n.rotate-icon {\n  -webkit-transform: rotate(-90deg);\n          transform: rotate(-90deg);\n}\n.menu-item span {\n  display: inline-block;\n  overflow: hidden;\n  width: 69px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  vertical-align: bottom;\n  -webkit-transition: width 0.2s ease 0.2s;\n  transition: width 0.2s ease 0.2s;\n}\n.menu-item i {\n  -webkit-transform: translateX(0px);\n          transform: translateX(0px);\n  -webkit-transition: font-size 0.2s ease, -webkit-transform 0.2s ease;\n  transition: font-size 0.2s ease, -webkit-transform 0.2s ease;\n  transition: font-size 0.2s ease, transform 0.2s ease;\n  transition: font-size 0.2s ease, transform 0.2s ease, -webkit-transform 0.2s ease;\n  vertical-align: middle;\n  font-size: 16px;\n}\n.menu-item .menu-icon {\n  display: inline-block;\n  width: 16px;\n  text-align: center;\n  margin-right: 5px;\n  margin-bottom: 2px;\n}\n.collapsed-menu span {\n  width: 0px;\n  -webkit-transition: width 0.2s ease;\n  transition: width 0.2s ease;\n}\n.collapsed-menu i {\n  -webkit-transform: translateX(5px);\n          transform: translateX(5px);\n  -webkit-transition: font-size 0.2s ease 0.2s, -webkit-transform 0.2s ease 0.2s;\n  transition: font-size 0.2s ease 0.2s, -webkit-transform 0.2s ease 0.2s;\n  transition: font-size 0.2s ease 0.2s, transform 0.2s ease 0.2s;\n  transition: font-size 0.2s ease 0.2s, transform 0.2s ease 0.2s, -webkit-transform 0.2s ease 0.2s;\n  vertical-align: middle;\n  font-size: 22px;\n}\n", ""]);
 
 // exports
 
@@ -7198,6 +7173,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_good_storage__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_good_storage___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_good_storage__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__catalogs__ = __webpack_require__(90);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 //
@@ -7292,6 +7268,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
 
 
 
@@ -7301,56 +7284,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
             isCollapsed: false, //是否横向折叠
             activeName: "1-1",
             openNames: ['1'],
-            catalogs: [{
-                name: "1",
-                iconType: "ios-navigate",
-                title: "演出",
-                menus: [{
-                    name: "1-1",
-                    title: "演出",
-                    path: '/performance'
-                }]
-            }, {
-                name: "2",
-                iconType: "ios-navigate",
-                title: "演员",
-                menus: [{
-                    name: "2-1",
-                    title: "演员",
-                    path: '/actor'
-                }, {
-                    name: "2-2",
-                    title: "foo"
-                }, {
-                    name: "2-3",
-                    title: "bar"
-                }]
-            }, {
-                name: "3",
-                iconType: "ios-navigate",
-                title: "其他",
-                menus: [{
-                    name: "3-1",
-                    title: "剧团"
-                }, {
-                    name: "3-2",
-                    title: "剧种"
-                }, {
-                    name: "3-3",
-                    title: "演出地点"
-                }, {
-                    name: "3-4",
-                    title: "备份类型"
-                }]
-            }, {
-                name: "4",
-                iconType: "ios-navigate",
-                title: "平台",
-                menus: [{
-                    name: "4-1",
-                    title: "用户表"
-                }]
-            }]
+            catalogs: __WEBPACK_IMPORTED_MODULE_2__catalogs__["a" /* catalogs */]
         };
     },
 
@@ -7490,12 +7424,17 @@ var render = function() {
                             }
                           },
                           [
+                            menu.icon
+                              ? _c("Icon", {
+                                  staticClass: "menu-icon",
+                                  attrs: { type: menu.icon }
+                                })
+                              : _vm._e(),
                             _vm._v(
-                              "\n                        " +
-                                _vm._s(menu.title) +
-                                "\n                    "
+                              _vm._s(menu.title) + "\n                    "
                             )
-                          ]
+                          ],
+                          1
                         )
                       })
                     ],
@@ -45003,6 +44942,71 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 87 */,
+/* 88 */,
+/* 89 */,
+/* 90 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return catalogs; });
+//左侧目录信息
+var catalogs = [{
+    name: "1",
+    iconType: "ios-navigate",
+    title: "演出",
+    menus: [{
+        name: "1-1",
+        title: "演出",
+        icon: "videocamera",
+        path: '/performance'
+    }]
+}, {
+    name: "2",
+    iconType: "ios-navigate",
+    title: "演员",
+    menus: [{
+        name: "2-1",
+        title: "演员",
+        icon: "man",
+        path: '/actor'
+    }, {
+        name: "2-2",
+        title: "foo"
+    }]
+}, {
+    name: "3",
+    iconType: "ios-navigate",
+    title: "其他",
+    menus: [{
+        name: "3-1",
+        icon: "ios-people",
+        title: "剧团"
+    }, {
+        name: "3-2",
+        icon: "ios-pricetag",
+        title: "剧种"
+    }, {
+        name: "3-3",
+        icon: "location",
+        title: "演出地点"
+    }, {
+        name: "3-4",
+        icon: "android-settings",
+        title: "备份类型"
+    }]
+}, {
+    name: "4",
+    iconType: "ios-navigate",
+    title: "平台",
+    menus: [{
+        name: "4-1",
+        icon: "person",
+        title: "用户表"
+    }]
+}];
 
 /***/ })
 ],[19]);
