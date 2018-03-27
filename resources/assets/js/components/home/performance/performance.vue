@@ -5,6 +5,9 @@
                 <Button type="primary" size="small" class="topbar-item-add" @click="toggleAddModal">
                     <Icon type="android-add-circle" style="margin-right:8px"></Icon>新增
                 </Button>
+                <Button type="ghost" size="small" class="topbar-item-add" @click="toggleSearchModal">
+                    <Icon type="search" style="margin-right:8px"></Icon>筛选
+                </Button>
             </div>
             <div class="topbar-item">
                 数量： <b><h4 style="display:inline-block">{{count}}</h4></b>
@@ -41,6 +44,48 @@
             <p><b>接收记录</b>：{{perfDetail.perf_receive}}</p>
             <br>
             <p><b>输出记录</b>：{{perfDetail.perf_output}}</p>
+        </Modal>
+        <!--检索-->
+        <Modal
+                v-model="searchFlag"
+                title="检索"
+                @on-ok="search"
+        >
+            <Form ref="searchForm" :model="searchObj"  :label-width="80">
+                <FormItem label="演出日期">
+                    <DatePicker :value="searchObj.perf_date" format="yyyy/MM/dd" type="daterange" placement="bottom-end"
+                                placeholder="Select date" style="width: 200px"
+                                @on-change="_selectDateForSearch"></DatePicker>
+                </FormItem>
+                <FormItem label="剧种">
+                    <Select v-model="searchObj.perf_type.type_id" style="width:200px">
+                        <Option v-for="(type, index) of types" :value="type.type_id" :key="index">{{ type.type_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="剧团">
+                    <Select v-model="searchObj.perf_troupe.troupe_id" style="width:200px">
+                        <Option v-for="(troupe, index) of troupes" :value="troupe.troupe_id" :key="index">{{ troupe.troupe_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="演出地点">
+                    <Select v-model="searchObj.perf_addr.addr_id" style="width:200px">
+                        <Option v-for="(addr, index) of addrs" :value="addr.addr_id" :key="index">{{ addr.addr_name }}</Option>
+                    </Select>
+                </FormItem>
+                <FormItem label="演员">
+                    <Select
+                            v-model="searchObj.perf_actors"
+                            filterable
+                            remote
+                            multiple
+                            :remote-method="searchActors"
+                            :loading="fetchActorsLoading"
+                            :loading-text="fetchActorsLoadingText"
+                    >
+                        <Option v-for="(actor, index) of actors" :value="actor.actor_id" :key="index">{{actor.actor_name}}</Option>
+                    </Select>
+                </FormItem>
+            </Form>
         </Modal>
         <!--新增-->
         <Modal
@@ -223,6 +268,10 @@
                 //删除
                     deleteFlag: false,
                     perfId: "",
+                //检索
+                    searchFlag: false,
+                    searchObj: this._resetAddObj(),
+                    searchCondition: "", //作为fetchData接口的成员
                 //获取演员
                     fetchActorsLoading: false,
                     fetchActorsLoadingText: `2秒后开始搜索...`,
@@ -380,7 +429,14 @@
                 ]
             }
         },
+        created(){
+            //todo create 不应该做dom操作， 否则，就需要this.$nextTick()
+            this.$watch('query', httpUtils.debounce((newQuery) => {
+                this.searchActorsDebounce(newQuery)
+            },this.delay))
+        },
         mounted(){
+            //todo mounted 一般跟dom有关初始化的在这个周期开始操作
             //调整表格大小
             this.resetTableWidth()
             //获取数据
@@ -395,17 +451,25 @@
             //卸载轮询器
             clearInterval(interval)
         },
-        created(){
-          this.$watch('query', httpUtils.debounce((newQuery) => {
-              this.searchActorsDebounce(newQuery)
-          },this.delay))
-        },
         computed:{
             ...mapGetters([
                 'tableData'
             ])
         },
         methods:{
+            //检索
+            toggleSearchModal(){
+              this.searchFlag = !this.searchFlag
+            },
+            _selectDateForSearch(v){
+                this.searchObj.perf_date = v
+            },
+            search(){
+               let body = Object.assign({}, this.searchObj)
+                     body = this._pakNormalBody(body)
+                this.searchCondition = body
+                this.fetchData('page')
+            },
             //增加
             toggleAddModal(){
                 this.addFlag = !this.addFlag
@@ -429,10 +493,14 @@
             //组装add的通讯用的body
             _pakAddBody(){
                 let body = objUtils.deepClone(this.addObj)
-                body.perf_addr = body.perf_addr.addr_id
-                body.perf_troupe = body.perf_troupe.troupe_id
-                body.perf_type = body.perf_type.type_id
-                this.addObj = this._resetAddObj()
+                    body = this._pakNormalBody()
+                this.addObj = this._resetAddObj(body)
+                return body
+            },
+            _pakNormalBody(body){
+                Reflect.set(body, 'perf_type', body.perf_type.type_id)
+                Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id)
+                Reflect.set(body, 'perf_addr', body.perf_addr.addr_id)
                 return body
             },
             //addObj重置，复用在data定义和http通讯两个地方
@@ -476,9 +544,7 @@
                 let body = objUtils.deepClone(this.editObj),
                     deleteKeyArr = ['perf_detail', '_index', '_rowKey', 'actors']
                     Reflect.set(body, 'perf_actors', body.actors)
-                    Reflect.set(body, 'perf_type', body.perf_type.type_id)
-                    Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id)
-                    Reflect.set(body, 'perf_addr', body.perf_addr.addr_id)
+                    body = this._pakNormalBody(body)
 
                     deleteKeyArr.forEach(key => {
                         Reflect.deleteProperty(body, key)
@@ -529,12 +595,16 @@
                 }
             },
             fetchData(api, highlight = null){
+                let condition = {
+                    page: this.page,
+                    pageSize: this.pageSize,
+                }
+                if(this.searchCondition instanceof Object){
+                    condition.searchCondition = this.searchCondition
+                }
                 this.loading = true
                 this.$http
-                    .post(`${this.name}/${api}`, {
-                        page: this.page,
-                        pageSize: this.pageSize,
-                    })
+                    .post(`${this.name}/${api}`, condition)
                     .then(res=>{
                         this.loading = false
                         res = res.data
@@ -555,9 +625,6 @@
                         this.addrs = res.addrs
                     })
             },
-            ...mapMutations({
-                setTableData:'SET_TABLE_DATA'
-            }),
             //获取演员
             searchActors(query){
                 if(query !== ""){
@@ -595,7 +662,10 @@
                     }, err=>{
                         this.fetchActorsLoading = false
                     })
-            }
+            },
+            ...mapMutations({
+                setTableData:'SET_TABLE_DATA'
+            })
         }
     }
 </script>
@@ -611,9 +681,12 @@
             justify-content:baseline
             align-items center
             .topbar-item
-                width 120px
+                width 260px
                 .topbar-item-add
-                    width 60%
+                    display inline-block
+                    width 30%
+                    &:nth-child(2)
+                        margin-left 10px
         .page
             width 55%
             margin 28px auto 0 auto

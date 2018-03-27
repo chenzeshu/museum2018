@@ -57,4 +57,32 @@ class Performance extends Model
         return $this->hasOne(Troupe::class, 'troupe_id', 'perf_troupe')
                      ->select(['troupe_id', 'troupe_name']);
     }
+
+    /**
+     * scope 定义要大写，但是注意使用时全部要小写
+     * @param $sc 检索条件
+     */
+    public function scopeFetchData($query, $sc)
+    {
+        return $query->where(function ($query)use($sc){
+                if(!empty($sc['perf_date'])){
+                    $query->whereBetween('perf_date', $sc['perf_date']);
+                }
+            })
+            ->where(function ($query)use($sc){
+                if(!empty($sc['perf_troupe'])){
+                    $query->where('perf_troupe', $sc['perf_troupe']);
+                }
+            })
+            ->where(function ($query)use($sc){
+                if(!empty($sc['perf_addr'])){
+                    $query->where('perf_addr', $sc['perf_addr']);
+                }
+            })
+            ->where(function ($query)use($sc){
+                if(!empty($sc['perf_type'])){
+                    $query->where('perf_type', $sc['perf_type']);
+                }
+            });
+    }
 }

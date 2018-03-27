@@ -10,13 +10,9 @@
     import Home from './home/index/index'
     import {mapGetters, mapMutations} from 'vuex'
     import storage from 'good-storage'
-    import {Base64} from '../utils/base64'
+    import {decode} from "../utils/base64";
 
     export default {
-        data(){
-            return {
-            }
-        },
         mounted() {
             this.checkExp() //todo 检查token是否过期
         },
@@ -27,13 +23,14 @@
         },
         methods:{
             checkExp(){
-                let token = storage.get('token')
+                let token = storage.get('token'),
+                    exp, now
                 if(!token){
                     this.changeFlagLogin(false)
                 }else{
                     token = token.replace(/Bearer /, "").split(".")[1]
-                    let exp = new Base64().decode(token).replace("{","").replace("}","").split(",")[3].slice(-10)*1000,
-                        now = Date.now()
+                    exp = JSON.parse(decode(token)).exp*1000
+                    now = Date.now()
                     if(exp < now){
                         // 已经过期
                         this.changeFlagLogin(false)

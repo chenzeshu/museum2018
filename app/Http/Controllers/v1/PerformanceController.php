@@ -20,24 +20,13 @@ class PerformanceController extends CommonController
     }
 
     /**
-     * 分页获取数据
+     * (根据条件)分页获取数据
      */
     public function page(Request $request)
     {
-        $page = $request->page;
-        $pageSize = $request->pageSize;
-        $begin = ($page - 1) * $pageSize;
-        $data = Performance::offset($begin)
-            ->limit($pageSize)
-            ->with(['perfActors', 'perfDetail', 'perfType', 'perfAddr', 'perfTroupe'])
-            ->orderBy('perf_id', 'desc')
-            ->get()
-            ->toArray();
-        $count = Performance::count();
-        $data = [
-            'data' => $data,
-            'count' => $count
-        ];
+        $sc = $request->searchCondition;
+        $perf = Performance::fetchdata($sc);
+        $data = $this->dao->fetDataAndCountWithPage($request, $perf, $sc);
 
         return $this->resSuccess('获取演出信息成功', $data);
     }

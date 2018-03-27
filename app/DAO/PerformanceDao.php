@@ -11,9 +11,32 @@ namespace App\DAO;
 
 use App\Model\Common\Record;
 use App\Model\Perf\Performance;
+use App\Model\Perf\PerformanceActor;
 
-class PerformanceDao
+class PerformanceDao extends PerformanceActor
 {
+    public function fetDataAndCountWithPage($request, $perf, $sc)
+    {
+        $pageSize = $request->pageSize;
+        $begin = ($request->page - 1) * $pageSize;
+        $data = $perf->offset($begin)
+                    ->limit($pageSize)
+                    ->with(['perfActors'=>function($query)use($sc){
+                        if(!empty($sc['perf_actors'])){
+                            $query->whereIn('actor_id', $sc['perf_actors']);
+                        }
+                    }, 'perfDetail', 'perfType', 'perfAddr', 'perfTroupe'])
+                    ->orderBy('perf_id', 'desc')
+                    ->get()
+                    ->toArray();;
+        $count = $perf->count();
+
+        return [
+            'data' => $data,
+            'count' => $count
+        ];
+    }
+    
     /**
      * 新增performance的演员
      * @param {stdClass} $perf Perfomance表本体
