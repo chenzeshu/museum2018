@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-
+use \Illuminate\Support\Facades\DB;
 class FakerSeed extends Seeder
 {
     /**
@@ -11,6 +11,7 @@ class FakerSeed extends Seeder
      */
     public function run()
     {
+
         //todo 创建额外10个用户
         factory(\App\User::class, 10)->create();
         //todo 创建100个演出

@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-         $this->call(BaseSeed::class);  //基本信息， 上线时更改后再seed
-         $this->call(FakerSeed::class); //模拟信息， 上线时不需要。
+        $this->call(BaseSeed::class);  //基本信息， 上线时更改后再seed
+        $this->call(FakerSeed::class); //模拟信息， 上线时不需要。
     }
 }

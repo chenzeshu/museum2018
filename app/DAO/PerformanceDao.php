@@ -21,11 +21,16 @@ class PerformanceDao extends PerformanceActor
         $begin = ($request->page - 1) * $pageSize;
         $data = $perf->offset($begin)
                     ->limit($pageSize)
-                    ->with(['perfActors'=>function($query)use($sc){
-                        if(!empty($sc['perf_actors'])){
-                            $query->whereIn('actor_id', $sc['perf_actors']);
-                        }
-                    }, 'perfDetail', 'perfType', 'perfAddr', 'perfTroupe'])
+                    ->with([
+                        'perfActors'=>function($query)use($sc){
+                            if(!empty($sc['perf_actors'])){
+                                $query->whereIn('actor_id', $sc['perf_actors']);
+                            }
+                         },
+                        'perfFiles'=>function($query){
+                            $query->where('file_type', 'photo');
+                        },
+                        'perfDetail', 'perfType', 'perfAddr', 'perfTroupe'])
                     ->orderBy('perf_id', 'desc')
                     ->get()
                     ->toArray();;

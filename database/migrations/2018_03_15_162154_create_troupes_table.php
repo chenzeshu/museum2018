@@ -50,6 +50,17 @@ class CreateTroupesTable extends Migration
             $table->unsignedInteger('record_number')->default(0)->comment('记录当前的序号，不包括年');   //每年重置这个表
             $table->timestamps();
         });
+
+        //文件表
+        Schema::create('files', function (Blueprint $table) {
+            $table->increments('file_id');
+            $table->enum('file_type', config('app.fileType'))->comment('文件类型');
+            $table->string('file_name', 100)->nullable()->comment('文件名称');
+            $table->string('file_path', 128)->comment('文件路径');
+            $table->timestamps();
+            //索引
+            $table->index('file_type');
+        });
     }
 
     /**
@@ -64,5 +75,6 @@ class CreateTroupesTable extends Migration
         Schema::dropIfExists('baktypes');
         Schema::dropIfExists('addrs');
         Schema::dropIfExists('records');
+        Schema::dropIfExists('files');
     }
 }

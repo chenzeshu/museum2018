@@ -4,6 +4,7 @@ namespace App\Model\Perf;
 
 use App\Model\Actor\Actor;
 use App\Model\Common\Addr;
+use App\Model\Common\File;
 use App\Model\Common\Troupe;
 use App\Model\Common\Type;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ class Performance extends Model
     protected $guarded = [];
 
     /**
-     * 演出的三个文字详情
+     * 关系--演出的三个文字详情
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function perfDetail()
@@ -23,7 +24,7 @@ class Performance extends Model
     }
 
     /**
-     * 演出的演员
+     * 关系--演出的演员
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function perfActors()
@@ -32,7 +33,15 @@ class Performance extends Model
     }
 
     /**
-     * 演出剧种
+     * 关系--演出的文件
+     */
+    public function perfFiles()
+    {
+        return $this->belongsToMany(File::class, 'performance_files', 'perf_id', 'file_id');
+    }
+
+    /**
+     * 关系--演出剧种
      */
     public function perfType()
     {
@@ -41,7 +50,7 @@ class Performance extends Model
     }
 
     /**
-     * 演出地点
+     * 关系--演出地点
      */
     public function perfAddr()
     {
@@ -50,7 +59,7 @@ class Performance extends Model
     }
 
     /**
-     * 演出剧团
+     * 关系--演出剧团
      */
     public function perfTroupe()
     {

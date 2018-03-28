@@ -4,6 +4,11 @@ import store from './store'
 import axios from './axios'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css';
+// import VueLazyload from 'vue-lazyload'
+
+// Vue.use(VueLazyload, {
+//     lazyComponent:true
+// })
 
 
 Vue.use(iView)

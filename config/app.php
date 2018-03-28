@@ -25,6 +25,14 @@ return [
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
     /**
+     * files表的file_type
+     */
+    'fileType' => [
+        'photo',
+        'doc'
+    ],
+
+    /**
      * records表的record_tpye对应
      */
     'record' => [

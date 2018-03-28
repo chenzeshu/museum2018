@@ -29,7 +29,8 @@
                     this.changeFlagLogin(false)
                 }else{
                     token = token.replace(/Bearer /, "").split(".")[1]
-                    exp = JSON.parse(decode(token)).exp*1000
+                    token = JSON.parse(decode(token))
+                    exp =  token.exp*1000
                     now = Date.now()
                     if(exp < now){
                         // 已经过期

@@ -2,8 +2,9 @@ import axios from 'axios'
 import storage from 'good-storage'
 import {app} from '../app'
 import state from '../store/states'
+import params from '@utils/params'
 //todo 默认API前缀
-axios.defaults.baseURL = "http://laravel.test/api/v1"
+axios.defaults.baseURL = params.baseUrl
 
 //todo 请求拦截器
 axios.interceptors.request.use(config=>{
@@ -21,7 +22,7 @@ axios.interceptors.request.use(config=>{
 
 //todo 响应拦截器
 axios.interceptors.response.use(response => {
-    let token = response.headers.authorization
+    let token = response.headers.authorization.replace(/Bearer /, "")
     storage.set('token', token)
     return response
 }, error => {

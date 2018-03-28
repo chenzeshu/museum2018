@@ -23,11 +23,11 @@ class CreateActorsTable extends Migration
             $table->string('actor_record',600)->nullable()->comment('演员获奖经历');
             $table->timestamps();
         });
-        //演员照片表
-        Schema::create('actor_pics', function (Blueprint $table) {
+        //演员--文件中间表
+        Schema::create('actor_files', function (Blueprint $table) {
             $table->increments('ap_id')->comment('演员照片id');
             $table->unsignedInteger('actor_id')->comment('演员id');
-            $table->string('pic_path',128)->comment('照片存储路径');
+            $table->unsignedInteger('file_id')->comment('文件id');
             $table->timestamps();
 
             $table->index('actor_id')->comment('索引:演员id');
@@ -52,7 +52,7 @@ class CreateActorsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('actors');
-        Schema::dropIfExists('actor_pics');
+        Schema::dropIfExists('actor_files');
         Schema::dropIfExists('actor_troupe_histories');
     }
 }

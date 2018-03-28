@@ -2493,6 +2493,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+// import VueLazyload from 'vue-lazyload'
+
+// Vue.use(VueLazyload, {
+//     lazyComponent:true
+// })
+
 
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_4_iview___default.a);
 window.Vue = __WEBPACK_IMPORTED_MODULE_0_vue___default.a;
@@ -5604,7 +5610,7 @@ exports = module.exports = __webpack_require__(1)(false);
 
 
 // module
-exports.push([module.i, "\n.module-performance .topbar {\n  height: 32px;\n  margin: 8px 0;\n  padding-left: 16px;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: row;\n          flex-direction: row;\n  -webkit-box-pack: baseline;\n      -ms-flex-pack: baseline;\n          justify-content: baseline;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.module-performance .topbar .topbar-item {\n  width: 260px;\n}\n.module-performance .topbar .topbar-item .topbar-item-add {\n  display: inline-block;\n  width: 30%;\n}\n.module-performance .topbar .topbar-item .topbar-item-add:nth-child(2) {\n  margin-left: 10px;\n}\n.module-performance .page {\n  width: 55%;\n  margin: 28px auto 0 auto;\n}\n", ""]);
+exports.push([module.i, "\n.module-performance .topbar {\n  height: 32px;\n  margin: 8px 0;\n  padding-left: 16px;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: row;\n          flex-direction: row;\n  -webkit-box-pack: baseline;\n      -ms-flex-pack: baseline;\n          justify-content: baseline;\n  -webkit-box-align: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n.module-performance .topbar .topbar-item {\n  width: 260px;\n}\n.module-performance .topbar .topbar-item .topbar-item-add {\n  display: inline-block;\n  width: 30%;\n}\n.module-performance .topbar .topbar-item .topbar-item-add:nth-child(2) {\n  margin-left: 10px;\n}\n.module-performance .page {\n  width: 55%;\n  margin: 28px auto 0 auto;\n}\n.demo-upload-list {\n  display: inline-block;\n  width: 60px;\n  height: 60px;\n  text-align: center;\n  line-height: 60px;\n  border: 1px solid transparent;\n  border-radius: 4px;\n  overflow: hidden;\n  background: #fff;\n  position: relative;\n  -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.2);\n          box-shadow: 0 1px 1px rgba(0,0,0,0.2);\n  margin-right: 4px;\n}\n.demo-upload-list img {\n  width: 100%;\n  height: 100%;\n}\n.demo-upload-list .demo-upload-list-cover {\n  display: none;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  background: rgba(0,0,0,0.6);\n}\n.demo-upload-list:hover .demo-upload-list-cover {\n  display: block;\n}\n.demo-upload-list:hover .demo-upload-list-cover i {\n  color: #fff;\n  font-size: 20px;\n  cursor: pointer;\n  margin: 0 2px;\n}\n", ""]);
 
 // exports
 
@@ -5651,6 +5657,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_objUtils__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_httpUtils__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_good_storage__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_good_storage___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_good_storage__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_params__ = __webpack_require__(90);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 //
@@ -5886,6 +5895,46 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 
 
 
@@ -5941,6 +5990,21 @@ var interval;
             types: [],
             troupes: [],
             addrs: [],
+            //照片
+            visible: false,
+            visiblePath: "",
+            photoFlag: false,
+            photoList: [], //用于通讯
+            defaultPhotoList: [],
+            uploadPhotoList: [], //用于展示图片（与上传的photoList只含有id不同，内容较多），
+            photoHeaders: {
+                'Authorization': 'Bearer ' + __WEBPACK_IMPORTED_MODULE_3_good_storage___default.a.get('token'),
+                'type': 'photo'
+            },
+            photoAction: __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].baseUrl + '/file/upload',
+            photoName: 'photo', //给后端的字段名
+            photoFormat: __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].photoFormat,
+            photoSingleSize: __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].photoSingleSize,
             columns: [{
                 title: '编号',
                 key: 'perf_code',
@@ -6039,7 +6103,9 @@ var interval;
                             marginRight: '8px'
                         },
                         on: {
-                            click: function click() {}
+                            click: function click() {
+                                _this.togglePhotoModal(params.row);
+                            }
                         }
                     }, '照片'), h('Button', {
                         props: {
@@ -6098,6 +6164,80 @@ var interval;
 
     computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["b" /* mapGetters */])(['tableData'])),
     methods: _extends({
+        //照片
+        togglePhotoModal: function togglePhotoModal(row) {
+            this.photoFlag = !this.photoFlag;
+            this.editIndex = row._index; //用于高亮
+            //fixme 后台还没写
+            this.defaultPhotoList = row.perf_files.map(function (photo) {
+                return {
+                    file_id: photo.file_id,
+                    name: photo.file_name,
+                    url: __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].photoReplacePath(photo.file_path)
+                };
+            });
+            this.uploadPhotoList = this.defaultPhotoList.slice();
+            //row id
+            this.photoList = [];
+            this.photoList.push(row.perf_id); //在首位
+            //将default值也放入photoList
+            this.photoList = this.photoList.concat(this.defaultPhotoList.map(function (photo) {
+                return photo.file_id;
+            }));
+        },
+
+        //点击确定
+        //fixme 后期如果量大，可以改成md5识别重复文件以免传 or 报重复
+        axiosPhoto: function axiosPhoto() {
+            var _this4 = this;
+
+            var body = {};
+            body.perf_id = this.photoList.shift();
+            body.photoList = this.photoList;
+            this.$http.post(this.name + '/upload', body).then(function (res) {
+                _this4.$Message.success(res.data.msg);
+                _this4.fetchData('page', _this4.editIndex);
+            });
+        },
+        photoSuccess: function photoSuccess(response, file, fileList) {
+            this.photoList.push(file.response.file_id);
+            this.uploadPhotoList.push({
+                name: file.response.perf_name,
+                file_id: file.response.file_id,
+                url: __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].photoReplacePath(file.response.file_path)
+            });
+        },
+        photoRemove: function photoRemove(file, fileList) {
+            this.photoList = this.photoList.filter(function (photo) {
+                return photo !== file.file_id;
+            });
+            this.uploadPhotoList = this.uploadPhotoList.filter(function (photo) {
+                return photo.file_id !== file.file_id;
+            });
+        },
+        handleView: function handleView(path) {
+            this.visible = true;
+            this.visiblePath = path;
+        },
+        photoError: function photoError(err, file, fileList) {
+            this.$Message.error({
+                content: '上传失败，未知错误',
+                duration: 3
+            });
+        },
+        photoSizeError: function photoSizeError(file, fileList) {
+            this.$Message.error({
+                content: '\u6587\u4EF6\u8FC7\u5927\uFF0C\u4E0D\u8981\u8D85\u8FC7' + __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].photoSingleSize + 'KB!',
+                duration: 3
+            });
+        },
+        photoFormatError: function photoFormatError(file, fileList) {
+            this.$Message.error({
+                content: '\u6587\u4EF6\u683C\u5F0F\u9519\u8BEF!\u53EA\u652F\u6301' + __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].photoFormat.join(",") + '!',
+                duration: 3
+            });
+        },
+
         //检索
         toggleSearchModal: function toggleSearchModal() {
             this.searchFlag = !this.searchFlag;
@@ -6123,13 +6263,13 @@ var interval;
             this.addObj.perf_date = v;
         },
         add: function add() {
-            var _this4 = this;
+            var _this5 = this;
 
             var body = this._pakAddBody();
             this.$http.post(this.name + '/store', body).then(function (res) {
-                _this4.$Message.success(res.data.msg);
-                _this4.page = 1; //无论在哪一页新增，都会回到最初的那页
-                _this4.fetchData('page', 0); //新增的总是在最上面出现
+                _this5.$Message.success(res.data.msg);
+                _this5.page = 1; //无论在哪一页新增，都会回到最初的那页
+                _this5.fetchData('page', 0); //新增的总是在最上面出现
             });
         },
 
@@ -6178,12 +6318,12 @@ var interval;
             });
         },
         edit: function edit() {
-            var _this5 = this;
+            var _this6 = this;
 
             var body = this._pakEditBody();
             this.$http.post(this.name + '/update', body).then(function (res) {
-                _this5.$Message.success(res.data.msg);
-                _this5.fetchData('page', _this5.editIndex);
+                _this6.$Message.success(res.data.msg);
+                _this6.fetchData('page', _this6.editIndex);
             });
         },
         _pakEditBody: function _pakEditBody() {
@@ -6207,11 +6347,11 @@ var interval;
             this.perfId = perf_id;
         },
         destroy: function destroy() {
-            var _this6 = this;
+            var _this7 = this;
 
             this.$http.get(this.name + '/delete/' + this.perfId).then(function (res) {
-                _this6.$Message.success(res.data.msg);
-                _this6.fetchData('page');
+                _this7.$Message.success(res.data.msg);
+                _this7.fetchData('page');
             });
         },
 
@@ -6244,7 +6384,7 @@ var interval;
             }
         },
         fetchData: function fetchData(api) {
-            var _this7 = this;
+            var _this8 = this;
 
             var highlight = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
@@ -6257,24 +6397,24 @@ var interval;
             }
             this.loading = true;
             this.$http.post(this.name + '/' + api, condition).then(function (res) {
-                _this7.loading = false;
+                _this8.loading = false;
                 res = res.data;
                 if (highlight || highlight === 0) res.data.data[highlight]._highlight = true; //是否要高亮某一行 注意第0行不要被当成null...
-                _this7.$Message.success(res.msg);
-                _this7.setTableData(res.data.data);
-                _this7.count = res.data.count;
+                _this8.$Message.success(res.msg);
+                _this8.setTableData(res.data.data);
+                _this8.count = res.data.count;
             });
         },
 
         //剧种、剧团、地址
         fetchBaseData: function fetchBaseData() {
-            var _this8 = this;
+            var _this9 = this;
 
             this.$http.get(this.name + '/baseData').then(function (res) {
                 res = res.data.data;
-                _this8.types = res.types;
-                _this8.troupes = res.troupes;
-                _this8.addrs = res.addrs;
+                _this9.types = res.types;
+                _this9.troupes = res.troupes;
+                _this9.addrs = res.addrs;
             });
         },
 
@@ -6289,7 +6429,7 @@ var interval;
 
         //描述倒计时
         searchCountDown: function searchCountDown() {
-            var _this9 = this;
+            var _this10 = this;
 
             if (interval) {
                 clearInterval(interval);
@@ -6297,27 +6437,27 @@ var interval;
                 this.still = this.delay;
             }
             interval = setInterval(function () {
-                if (_this9.still > 0) {
-                    _this9.still = _this9.still - 100;
-                    _this9.fetchActorsLoadingText = _this9.still / 1000 + '\u79D2\u540E\u5F00\u59CB\u641C\u7D22';
+                if (_this10.still > 0) {
+                    _this10.still = _this10.still - 100;
+                    _this10.fetchActorsLoadingText = _this10.still / 1000 + '\u79D2\u540E\u5F00\u59CB\u641C\u7D22';
                 } else {
-                    _this9.fetchActorsLoadingText = '\u5DF2\u786E\u8BA4';
-                    _this9.still = _this9.delay;
+                    _this10.fetchActorsLoadingText = '\u5DF2\u786E\u8BA4';
+                    _this10.still = _this10.delay;
                 }
             }, 100);
         },
 
         //搜索演员（配合watch-debounce）
         searchActorsDebounce: function searchActorsDebounce(query) {
-            var _this10 = this;
+            var _this11 = this;
 
             this.$http.post('/actor/searchActors', {
                 query: query
             }).then(function (res) {
-                _this10.fetchActorsLoading = false;
-                _this10.actors = _this10.actors.concat(res.data.data);
+                _this11.fetchActorsLoading = false;
+                _this11.actors = _this11.actors.concat(res.data.data);
             }, function (err) {
-                _this10.fetchActorsLoading = false;
+                _this11.fetchActorsLoading = false;
             });
         }
     }, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["c" /* mapMutations */])({
@@ -7362,6 +7502,119 @@ var render = function() {
         },
         [_c("Alert", { attrs: { type: "error" } }, [_vm._v("确定删除？")])],
         1
+      ),
+      _vm._v(" "),
+      _c(
+        "Modal",
+        {
+          on: { "on-ok": _vm.axiosPhoto },
+          model: {
+            value: _vm.photoFlag,
+            callback: function($$v) {
+              _vm.photoFlag = $$v
+            },
+            expression: "photoFlag"
+          }
+        },
+        [
+          _vm._l(_vm.uploadPhotoList, function(item, index) {
+            return _c(
+              "div",
+              { key: index, staticClass: "demo-upload-list" },
+              [
+                [
+                  _c("img", { attrs: { src: item.url } }),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "demo-upload-list-cover" },
+                    [
+                      _c("Icon", {
+                        attrs: { type: "ios-eye-outline" },
+                        nativeOn: {
+                          click: function($event) {
+                            _vm.handleView(item.url)
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("Icon", {
+                        attrs: { type: "ios-trash-outline" },
+                        nativeOn: {
+                          click: function($event) {
+                            _vm.photoRemove(item)
+                          }
+                        }
+                      })
+                    ],
+                    1
+                  )
+                ]
+              ],
+              2
+            )
+          }),
+          _vm._v(" "),
+          _c(
+            "Upload",
+            {
+              ref: "upload",
+              staticStyle: { display: "inline-block", width: "58px" },
+              attrs: {
+                multiple: "",
+                type: "drag",
+                "show-upload-list": false,
+                action: _vm.photoAction,
+                name: _vm.photoName,
+                headers: _vm.photoHeaders,
+                "default-file-list": _vm.defaultPhotoList,
+                format: _vm.photoFormat,
+                "max-size": _vm.photoSingleSize,
+                "on-format-error": _vm.photoFormatError,
+                "on-exceeded-size": _vm.photoSizeError,
+                "on-success": _vm.photoSuccess,
+                "on-error": _vm.photoError
+              }
+            },
+            [
+              _c(
+                "div",
+                {
+                  staticStyle: {
+                    width: "58px",
+                    height: "58px",
+                    "line-height": "58px"
+                  }
+                },
+                [_c("Icon", { attrs: { type: "camera", size: "20" } })],
+                1
+              )
+            ]
+          )
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c(
+        "Modal",
+        {
+          attrs: { title: "View Image" },
+          model: {
+            value: _vm.visible,
+            callback: function($$v) {
+              _vm.visible = $$v
+            },
+            expression: "visible"
+          }
+        },
+        [
+          _vm.visible
+            ? _c("img", {
+                staticStyle: { width: "100%" },
+                attrs: { src: _vm.visiblePath }
+              })
+            : _vm._e()
+        ]
       )
     ],
     1
@@ -8049,12 +8302,14 @@ var SET_TABLE_DATA = "SET_TABLE_DATA";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_good_storage___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_good_storage__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store_states__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__utils_params__ = __webpack_require__(90);
+
 
 
 
 
 //todo 默认API前缀
-__WEBPACK_IMPORTED_MODULE_0_axios___default.a.defaults.baseURL = "http://laravel.test/api/v1";
+__WEBPACK_IMPORTED_MODULE_0_axios___default.a.defaults.baseURL = __WEBPACK_IMPORTED_MODULE_4__utils_params__["a" /* default */].baseUrl;
 
 //todo 请求拦截器
 __WEBPACK_IMPORTED_MODULE_0_axios___default.a.interceptors.request.use(function (config) {
@@ -8072,7 +8327,7 @@ __WEBPACK_IMPORTED_MODULE_0_axios___default.a.interceptors.request.use(function 
 
 //todo 响应拦截器
 __WEBPACK_IMPORTED_MODULE_0_axios___default.a.interceptors.response.use(function (response) {
-    var token = response.headers.authorization;
+    var token = response.headers.authorization.replace(/Bearer /, "");
     __WEBPACK_IMPORTED_MODULE_1_good_storage___default.a.set('token', token);
     return response;
 }, function (error) {
@@ -44679,7 +44934,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
                 this.changeFlagLogin(false);
             } else {
                 token = token.replace(/Bearer /, "").split(".")[1];
-                exp = JSON.parse(Object(__WEBPACK_IMPORTED_MODULE_4__utils_base64__["a" /* decode */])(token)).exp * 1000;
+                token = JSON.parse(Object(__WEBPACK_IMPORTED_MODULE_4__utils_base64__["a" /* decode */])(token));
+                exp = token.exp * 1000;
                 now = Date.now();
                 if (exp < now) {
                     // 已经过期
@@ -45233,6 +45489,24 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 88 */,
+/* 89 */,
+/* 90 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function photoReplacePath(path) {
+    return path.replace(/public/, "http://laravel.test/storage");
+}
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+    baseUrl: 'http://laravel.test/api/v1',
+    photoFormat: ['jpg', 'jpeg', 'png'],
+    photoSingleSize: 500,
+    photoReplacePath: photoReplacePath
+});
 
 /***/ })
 ],[19]);

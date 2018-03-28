@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-
 class BaseSeed extends Seeder
 {
     /**
@@ -30,8 +29,8 @@ class BaseSeed extends Seeder
         ]);
 
         DB::table('records')->insert([
-           'record_type'=>1,
-           'record_number'=>0,
+            'record_type'=>1,
+            'record_number'=>0,
         ]);
     }
 }

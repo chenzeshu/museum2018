@@ -55,15 +55,17 @@ class CreatePerformancesTable extends Migration
             $table->index('actor_id')->comment('索引：找演员本体');
         });
 
-        //演出照片表
-        Schema::create('performance_pics', function (Blueprint $table) {
-            $table->increments('pp_id');
+        //演出-文件中间表
+        Schema::create('performance_files', function (Blueprint $table) {
+            $table->increments('pf_id');
             $table->unsignedInteger('perf_id')->comment('演出id');
-            $table->string('pic_path', 128)->comment('演出照片存储路径');
+            $table->unsignedInteger('file_id')->comment('文件id');
             $table->timestamps();
 
             $table->index('perf_id')->comment('索引：找演出本体');
         });
+
+
 
         //演出备份记录表
         Schema::create('performance_bak_records', function (Blueprint $table) {
@@ -87,7 +89,7 @@ class CreatePerformancesTable extends Migration
         Schema::dropIfExists('performances');
         Schema::dropIfExists('performance_details');
         Schema::dropIfExists('performance_actors');
-        Schema::dropIfExists('performance_pics');
+        Schema::dropIfExists('performance_files');
         Schema::dropIfExists('performance_baks');
         Schema::dropIfExists('performance_bak_records');
     }

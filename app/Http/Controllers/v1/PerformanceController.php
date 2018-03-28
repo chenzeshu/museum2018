@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\v1;
 
 use App\DAO\PerformanceDao;
-use App\Http\Controllers\Controller;
 use App\Model\Common\Addr;
 use App\Model\Common\Troupe;
 use App\Model\Common\Type;
 use App\Model\Perf\Performance;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+
 class PerformanceController extends CommonController
 {
     protected $dao;
@@ -70,13 +69,24 @@ class PerformanceController extends CommonController
 
     /**
      * 删除
+     * fixme 还有删除文件没有做----只删关系
      */
     public function delete($perf_id)
     {
         $perf = Performance::findOrFail($perf_id);
-        $perf->perfActors()->detach(); //todo 删除中间表
+        $perf->perfActors()->detach(); //todo 删除演员中间表关联数据
         $perf->perfDetail()->delete(); //todo 删除细节表
+        $perf->perfFiles()->delete(); //todo 删除文件中间表关联数据
         $perf->delete(); //todo 删除自身
         return $this->resSuccess('删除成功', []);
+    }
+
+    /**
+     * 其实是文件关联
+     */
+    public function upload(Request $request)
+    {
+        Performance::findOrFail($request->perf_id)->perfFiles()->sync($request->photoList);
+        return $this->resSuccess('文件上传成功', []);
     }
 }
