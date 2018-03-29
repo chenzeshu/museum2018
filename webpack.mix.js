@@ -21,6 +21,8 @@ mix.webpackConfig({
             "@style": path.resolve(__dirname, 'resources/assets/stylus/'),
             "@home": path.resolve(__dirname, 'resources/assets/js/components/home/'),
             "@utils": path.resolve(__dirname, 'resources/assets/js/utils/'),
+            "@base": path.resolve(__dirname, 'resources/assets/js/base/'),
+            "@mixins": path.resolve(__dirname, 'resources/assets/js/mixins/'),
         }
     }
 })

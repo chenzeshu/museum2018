@@ -227,65 +227,31 @@
             <Alert type="error">确定删除？</Alert>
         </Modal>
         <!--编辑照片-->
-        <Modal
-            v-model="photoFlag"
-            @on-ok="axiosPhoto"
-        >
-            <div class="demo-upload-list" v-for="(item, index) in uploadPhotoList" :key="index">
-                <template>
-                    <img :src="item.url">
-                    <div class="demo-upload-list-cover">
-                        <Icon type="ios-eye-outline" @click.native="handleView(item.url)"></Icon>
-                        <Icon type="ios-trash-outline" @click.native="photoRemove(item)"></Icon>
-                    </div>
-                </template>
-            </div>
-
-            <Upload
-                    ref="upload"
-                    multiple
-                    type="drag"
-                    :show-upload-list="false"
-                    :action="photoAction"
-                    :name="photoName"
-                    :headers="photoHeaders"
-                    :default-file-list="defaultPhotoList"
-                    :format="photoFormat"
-                    :max-size="photoSingleSize"
-                    :on-format-error="photoFormatError"
-                    :on-exceeded-size="photoSizeError"
-                    :on-success="photoSuccess"
-                    :on-error="photoError"
-                    style="display: inline-block;width:58px;">
-                <div style="width: 58px;height:58px;line-height: 58px;">
-                    <Icon type="camera" size="20"></Icon>
-                </div>
-            </Upload>
-        </Modal>
-
-        <Modal title="View Image" v-model="visible">
-            <img :src="visiblePath" v-if="visible" style="width: 100%">
-        </Modal>
+        <PhotoModal
+            :photoFlag="photoFlag"
+            :uploadPhotoList="defaultPhotoList"
+            @on-confirm="onConfirm"
+            @on-flag="onPhotoFlag"
+        ></PhotoModal>
     </div>
 </template>
 
 <script>
-    import {mapGetters, mapMutations} from 'vuex'
     import objUtils from '@utils/objUtils'
     import httpUtils from '@utils/httpUtils'
-    import storage from 'good-storage'
-    import params from '@utils/params'
+    import PhotoModal from '@base/PhotoModal/PhotoModal'
+    import photoMixin from '@mixins/photoMixin.js'
+    import dataAndPageMixin from '@mixins/dataAndPageMixin.js'
+    import curdMixin from '@mixins/curdMixin.js'
 
     var interval;
     export default {
+        mixins: [photoMixin, dataAndPageMixin, curdMixin],
         name: "performance",
         data(){
             return {
                 //基础数据
                 name: "performance",
-                page: 1,
-                pageSize: 10,
-                loading: false,
                 tableWidth: 1080,   //默认表格宽度
                 //模态框
                     //演员详情
@@ -294,20 +260,7 @@
                     //演出详情
                     perfDetailFlag: false,
                     perfDetail: {},
-                //分页
-                    count: 0,
-                //新增
-                    addFlag: false,
-                    addAlterFlag: false,
-                    addObj: this._resetAddObj(),
-                //修改
-                    editFlag: false,
-                    editAlterFlag: false, //开关选填信息， 太占位置了
-                    editObj: {},
-                    editIndex: 0,
-                //删除
-                    deleteFlag: false,
-                    perfId: "",
+
                 //检索
                     searchFlag: false,
                     searchObj: this._resetAddObj(),
@@ -324,21 +277,6 @@
                     types: [],
                     troupes: [],
                     addrs: [],
-                //照片
-                    visible:false,
-                    visiblePath: "",
-                    photoFlag: false,
-                    photoList : [], //用于通讯
-                    defaultPhotoList: [],
-                    uploadPhotoList: [], //用于展示图片（与上传的photoList只含有id不同，内容较多），
-                    photoHeaders:{
-                      'Authorization': `Bearer ${storage.get('token')}`,
-                      'type' : 'photo'
-                    },
-                    photoAction: `${params.baseUrl}/file/upload`,
-                    photoName:'photo',  //给后端的字段名
-                    photoFormat: params.photoFormat,
-                    photoSingleSize: params.photoSingleSize,
                 columns: [
                     {
                         title: '编号',
@@ -506,80 +444,7 @@
             //卸载轮询器
             clearInterval(interval)
         },
-        computed:{
-            ...mapGetters([
-                'tableData'
-            ])
-        },
         methods:{
-            //照片
-            togglePhotoModal(row){
-                this.photoFlag = !this.photoFlag
-                this.editIndex = row._index//用于高亮
-                //fixme 后台还没写
-                this.defaultPhotoList = row.perf_files.map(photo=>{
-                    return {
-                        file_id: photo.file_id,
-                        name: photo.file_name,
-                        url: params.photoReplacePath(photo.file_path)
-                    }
-                })
-                this.uploadPhotoList = this.defaultPhotoList.slice()
-                //row id
-                this.photoList = []
-                this.photoList.push(row.perf_id)        //在首位
-                //将default值也放入photoList
-                this.photoList = this.photoList.concat(this.defaultPhotoList.map(photo=>{
-                    return photo.file_id
-                }))
-            },
-            //点击确定
-            //fixme 后期如果量大，可以改成md5识别重复文件以免传 or 报重复
-            axiosPhoto(){
-                let body = {}
-                body.perf_id = this.photoList.shift()
-                body.photoList = this.photoList
-                this.$http
-                    .post(`${this.name}/upload`, body)
-                    .then(res=>{
-                        this.$Message.success(res.data.msg)
-                        this.fetchData('page', this.editIndex)
-                    })
-            },
-            photoSuccess(response,file,fileList){
-                this.photoList.push(file.response.file_id)
-                this.uploadPhotoList.push({
-                    name: file.response.perf_name,
-                    file_id: file.response.file_id,
-                    url: params.photoReplacePath(file.response.file_path)
-                })
-            },
-            photoRemove(file, fileList){
-                this.photoList = this.photoList.filter(photo=>photo !== file.file_id)
-                this.uploadPhotoList = this.uploadPhotoList.filter(photo=>photo.file_id !== file.file_id)
-            },
-            handleView(path){
-                this.visible = true
-                this.visiblePath = path
-            },
-            photoError(err,file,fileList){
-                this.$Message.error({
-                        content: '上传失败，未知错误',
-                        duration: 3
-                })
-            },
-            photoSizeError(file, fileList){
-                this.$Message.error({
-                    content: `文件过大，不要超过${params.photoSingleSize}KB!`,
-                    duration: 3
-                })
-            },
-            photoFormatError(file, fileList){
-                    this.$Message.error({
-                        content:`文件格式错误!只支持${params.photoFormat.join(",")}!`,
-                        duration: 3
-                    })
-            },
             //检索
             toggleSearchModal(){
                 this.searchFlag = !this.searchFlag
@@ -593,39 +458,33 @@
                 this.searchCondition = body
                 this.fetchData('page')
             },
-            //增加
-            toggleAddModal(){
-                this.addFlag = !this.addFlag
-            },
-            _toggleAddAlterFlag(){
-              this.addAlterFlag = !this.addAlterFlag
-            },
-            _selectDateForAdd(v){
-                this.addObj.perf_date = v
-            },
-            add(){
-                let body = this._pakAddBody()
-                this.$http
-                    .post(`${this.name}/store`, body)
-                    .then(res=>{
-                        this.$Message.success(res.data.msg)
-                        this.page = 1               //无论在哪一页新增，都会回到最初的那页
-                        this.fetchData('page', 0)   //新增的总是在最上面出现
-                    })
-            },
+
+            //todo curd自属
             //组装add的通讯用的body
             _pakAddBody(){
                 let body = objUtils.deepClone(this.addObj)
-                    body = this._pakNormalBody()
+                body = this._pakNormalBody(body)
                 this.addObj = this._resetAddObj(body)
                 return body
             },
-            _pakNormalBody(body){
-                Reflect.set(body, 'perf_type', body.perf_type.type_id)
-                Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id)
-                Reflect.set(body, 'perf_addr', body.perf_addr.addr_id)
+            _pakEditBody(){
+                let body = objUtils.deepClone(this.editObj)
+                    body = this._pakNormalBody(body)
+                    Reflect.set(body, 'perf_actors', body.actors)
+
+                let deleteKeyArr = ['perf_detail', '_index', '_rowKey', 'actors', 'perf_files']
+                deleteKeyArr.forEach(key => {
+                    Reflect.deleteProperty(body, key)
+                })
                 return body
             },
+                //pakAdd和pakEdit都用到的
+                _pakNormalBody(body){
+                    Reflect.set(body, 'perf_type', body.perf_type.type_id)
+                    Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id)
+                    Reflect.set(body, 'perf_addr', body.perf_addr.addr_id)
+                    return body
+                },
             //addObj重置，复用在data定义和http通讯两个地方
             _resetAddObj(){
                 return {
@@ -635,12 +494,14 @@
                     perf_actors: []
                 }
             },
-            //修改
-            toggleEditModal(source, index){
-                    this.editIndex = index
-                    this.editFlag = !this.editFlag
-                    this.editObj = objUtils.deepClone(source)
-                    this._initActorsValue()
+            _selectDateForAdd(v){
+                this.addObj.perf_date = v
+            },
+            _selectDateForEdit(date){
+                this.editObj.perf_date = date
+            },
+            _toggleAddAlterFlag(){
+                this.addAlterFlag = !this.addAlterFlag
             },
             _toggleEditAlterFlag(){
                 this.editAlterFlag = !this.editAlterFlag
@@ -654,46 +515,12 @@
                     return actor.actor_name
                 })
             },
-            edit(){
-                let body = this._pakEditBody()
-                this.$http
-                    .post(`${this.name}/update`, body)
-                    .then(res=>{
-                        this.$Message.success(res.data.msg)
-                        this.fetchData('page', this.editIndex)
-                    })
-            },
-            _pakEditBody(){
-                let body = objUtils.deepClone(this.editObj),
-                    deleteKeyArr = ['perf_detail', '_index', '_rowKey', 'actors']
-                    Reflect.set(body, 'perf_actors', body.actors)
-                    body = this._pakNormalBody(body)
-
-                    deleteKeyArr.forEach(key => {
-                        Reflect.deleteProperty(body, key)
-                    })
-                    return body
-            },
-            _selectDateForEdit(date){
-                this.editObj.perf_date = date
-            },
-            //删除
-            toggleDeleteModel(perf_id){
-                this.deleteFlag = !this.deleteFlag
-                this.perfId = perf_id
-            },
-            destroy(){
-                this.$http
-                    .get(`${this.name}/delete/${this.perfId}`)
-                    .then(res=>{
-                        this.$Message.success(res.data.msg)
-                        this.fetchData('page')
-                    })
-            },
-            //翻页
-            pageTurning(page){
-                this.page = page
-                this.fetchData('page')
+            //修改edit模态框
+            toggleEditModal(source, index){
+                    this.editIndex = index
+                    this.editFlag = !this.editFlag
+                    this.editObj = objUtils.deepClone(source)
+                    this._initActorsValue()
             },
             //性别统计
             _countSex(data, sex){
@@ -716,26 +543,6 @@
                 }else{
                     this.tableWidth = curComponentWidth *0.8
                 }
-            },
-            fetchData(api, highlight = null){
-                let condition = {
-                    page: this.page,
-                    pageSize: this.pageSize,
-                }
-                if(this.searchCondition instanceof Object){
-                    condition.searchCondition = this.searchCondition
-                }
-                this.loading = true
-                this.$http
-                    .post(`${this.name}/${api}`, condition)
-                    .then(res=>{
-                        this.loading = false
-                        res = res.data
-                        if(highlight || highlight === 0) res.data.data[highlight]._highlight = true;   //是否要高亮某一行 注意第0行不要被当成null...
-                        this.$Message.success(res.msg)
-                        this.setTableData(res.data.data)
-                        this.count = res.data.count
-                    })
             },
             //剧种、剧团、地址
             fetchBaseData(){
@@ -785,10 +592,10 @@
                     }, err=>{
                         this.fetchActorsLoading = false
                     })
-            },
-            ...mapMutations({
-                setTableData:'SET_TABLE_DATA'
-            })
+            }
+        },
+        components: {
+            PhotoModal
         }
     }
 </script>
@@ -813,36 +620,4 @@
         .page
             width 55%
             margin 28px auto 0 auto
-.demo-upload-list
-    display: inline-block;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    line-height: 60px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    overflow: hidden;
-    background: #fff;
-    position: relative;
-    box-shadow: 0 1px 1px rgba(0,0,0,.2);
-    margin-right: 4px;
-    img
-        width: 100%;
-        height: 100%;
-    .demo-upload-list-cover
-        display: none;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0,0,0,.6);
-    &:hover .demo-upload-list-cover
-        display: block;
-        i
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            margin: 0 2px;
-
 </style>
