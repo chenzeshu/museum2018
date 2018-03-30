@@ -148,6 +148,13 @@
                     <FormItem label="视频大小">
                         <Input type="text" v-model="addObj.perf_size" number></Input>
                     </FormItem>
+                    <FormItem label="备份类型">
+                        <RadioGroup v-model="addObj.perf_baktype.baktype_id">
+                            <Radio  :label="baktype.baktype_id"  v-for="(baktype, index) of baktypes" :key="index">
+                                <span>{{baktype.baktype_name}}</span>
+                            </Radio>
+                        </RadioGroup>
+                    </FormItem>
                 </div>
             </Form>
         </Modal>
@@ -216,6 +223,13 @@
                     <FormItem label="视频大小">
                         <Input type="text" v-model="editObj.perf_size" number></Input>
                     </FormItem>
+                    <FormItem label="备份类型">
+                        <RadioGroup v-model="editObj.perf_baktype.baktype_id">
+                            <Radio  :label="baktype.baktype_id"  v-for="(baktype, index) of baktypes" :key="index">
+                                <span>{{baktype.baktype_name}}</span>
+                            </Radio>
+                        </RadioGroup>
+                    </FormItem>
                 </div>
             </Form>
         </Modal>
@@ -240,6 +254,7 @@
     import objUtils from '@utils/objUtils'
     import httpUtils from '@utils/httpUtils'
     import PhotoModal from '@base/PhotoModal/PhotoModal'
+
     import photoMixin from '@mixins/photoMixin.js'
     import dataAndPageMixin from '@mixins/dataAndPageMixin.js'
     import curdMixin from '@mixins/curdMixin.js'
@@ -260,7 +275,6 @@
                     //演出详情
                     perfDetailFlag: false,
                     perfDetail: {},
-
                 //检索
                     searchFlag: false,
                     searchObj: this._resetAddObj(),
@@ -277,6 +291,7 @@
                     types: [],
                     troupes: [],
                     addrs: [],
+                    baktypes: [],
                 columns: [
                     {
                         title: '编号',
@@ -371,6 +386,22 @@
                         width: 100,
                     },
                     {
+                        title: '备份类型',
+                        key: 'perf_baktype',
+                        width: 100,
+                        render: (h, params) => {
+                            let type = params.row.perf_baktype.baktype_id === 1 ? 'warning' : 'success'
+                            return h('span',  [
+                                h('Button', {
+                                    props: {
+                                        type:  type,
+                                        size: 'small'
+                                    }
+                                }, params.row.perf_baktype.baktype_name)
+                            ])
+                        }
+                    },
+                    {
                         title: '操作',
                         width: 180,
                         align: 'center',
@@ -458,7 +489,6 @@
                 this.searchCondition = body
                 this.fetchData('page')
             },
-
             //todo curd自属
             //组装add的通讯用的body
             _pakAddBody(){
@@ -476,6 +506,7 @@
                 deleteKeyArr.forEach(key => {
                     Reflect.deleteProperty(body, key)
                 })
+                console.log(body)
                 return body
             },
                 //pakAdd和pakEdit都用到的
@@ -483,6 +514,7 @@
                     Reflect.set(body, 'perf_type', body.perf_type.type_id)
                     Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id)
                     Reflect.set(body, 'perf_addr', body.perf_addr.addr_id)
+                    Reflect.set(body, 'perf_baktype', body.perf_baktype.baktype_id)
                     return body
                 },
             //addObj重置，复用在data定义和http通讯两个地方
@@ -491,7 +523,8 @@
                     perf_troupe: {troupe_id:""},
                     perf_type:{type_id:""},
                     perf_addr:{addr_id:""},
-                    perf_actors: []
+                    perf_actors: [],
+                    perf_baktype:{baktype_id:""}
                 }
             },
             _selectDateForAdd(v){
@@ -521,6 +554,7 @@
                     this.editFlag = !this.editFlag
                     this.editObj = objUtils.deepClone(source)
                     this._initActorsValue()
+                    this.editAlterFlag = false
             },
             //性别统计
             _countSex(data, sex){
@@ -553,6 +587,7 @@
                         this.types = res.types
                         this.troupes = res.troupes
                         this.addrs = res.addrs
+                        this.baktypes = res.baktypes
                     })
             },
             //获取演员

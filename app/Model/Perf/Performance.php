@@ -4,6 +4,7 @@ namespace App\Model\Perf;
 
 use App\Model\Actor\Actor;
 use App\Model\Common\Addr;
+use App\Model\Common\Baktype;
 use App\Model\Common\File;
 use App\Model\Common\Troupe;
 use App\Model\Common\Type;
@@ -65,6 +66,14 @@ class Performance extends Model
     {
         return $this->hasOne(Troupe::class, 'troupe_id', 'perf_troupe')
                      ->select(['troupe_id', 'troupe_name']);
+    }
+
+    /**
+     * 关系--备份类型
+     */
+    public function perfBaktype()
+    {
+        return $this->hasOne(Baktype::class, 'baktype_id', 'perf_baktype');
     }
 
     /**

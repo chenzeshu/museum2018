@@ -30,7 +30,7 @@ class PerformanceDao extends PerformanceActor
                         'perfFiles'=>function($query){
                             $query->where('file_type', 'photo');
                         },
-                        'perfDetail', 'perfType', 'perfAddr', 'perfTroupe'])
+                        'perfDetail', 'perfType', 'perfAddr', 'perfTroupe', 'perfBaktype'])
                     ->orderBy('perf_id', 'desc')
                     ->get()
                     ->toArray();;

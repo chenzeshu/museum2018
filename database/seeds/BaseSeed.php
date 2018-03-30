@@ -24,6 +24,7 @@ class BaseSeed extends Seeder
 
         //备份类型
         DB::table('baktypes')->insert([
+            ['baktype_name' => '未备份'],
             ['baktype_name' => '存储器'],
             ['baktype_name' => '硬盘']
         ]);

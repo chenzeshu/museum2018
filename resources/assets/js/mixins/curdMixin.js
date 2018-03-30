@@ -26,10 +26,12 @@ export default {
         toggleEditModal(source, index) {
             this.editIndex = index
             this.editFlag = !this.editFlag
+            this.editAlterFlag = false
         },
         /***  基本不会被顶掉的  ***/
         toggleAddModal(){
             this.addFlag = !this.addFlag
+            this.addAlterFlag = false
         },
         add(){
             let body = this._pakAddBody()
@@ -39,6 +41,7 @@ export default {
                     this.$Message.success(res.data.msg)
                     this.page = 1               //无论在哪一页新增，都会回到最初的那页
                     this.fetchData('page', 0)   //新增的总是在最上面出现
+
                 })
         },
         edit(){

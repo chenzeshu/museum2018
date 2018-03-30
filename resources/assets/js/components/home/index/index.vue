@@ -27,13 +27,6 @@
                 <Header :style="{padding: 0}" class="layout-header-bar">
                     <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '20px 20px 0'}" type="navicon-round" size="24"></Icon>
                 </Header>
-                <!--<div class="breadcrumb">-->
-                    <!--<Breadcrumb separator="<b class='demo-breadcrumb-separator'>=></b>">-->
-                        <!--<BreadcrumbItem to="/performance">首页</BreadcrumbItem>-->
-                        <!--<BreadcrumbItem to="/">演出</BreadcrumbItem>-->
-                        <!--<BreadcrumbItem>Breadcrumb</BreadcrumbItem>-->
-                    <!--</Breadcrumb>-->
-                <!--</div>-->
 
                 <Content :style="{margin: '20px', background: '#fff', minHeight: '260px'}">
                     <router-view></router-view>
@@ -136,6 +129,9 @@
                     'menu-item',
                     this.isCollapsed ? 'collapsed-menu' : ''
                 ]
+            },
+            sideBarWidth () {
+
             },
             ...mapGetters([
                 'flagLogin'

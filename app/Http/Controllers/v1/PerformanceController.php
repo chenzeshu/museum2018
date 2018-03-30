@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\DAO\PerformanceDao;
 use App\Model\Common\Addr;
+use App\Model\Common\Baktype;
 use App\Model\Common\Troupe;
 use App\Model\Common\Type;
 use App\Model\Perf\Performance;
@@ -24,8 +25,8 @@ class PerformanceController extends CommonController
     public function page(Request $request)
     {
         $sc = $request->searchCondition;
-        $perf = Performance::fetchdata($sc);
-        $data = $this->dao->fetDataAndCountWithPage($request, $perf, $sc);
+        $perfs = Performance::fetchdata($sc);
+        $data = $this->dao->fetDataAndCountWithPage($request, $perfs, $sc);
 
         return $this->resSuccess('获取演出信息成功', $data);
     }
@@ -39,9 +40,9 @@ class PerformanceController extends CommonController
         $types = Type::all(['type_id','type_name'])->toArray();
         $troupes = Troupe::all(['troupe_id', 'troupe_name'])->toArray();
         $addrs = Addr::all(['addr_id', 'addr_name'])->toArray();
-
+        $baktypes = Baktype::all(['baktype_id', 'baktype_name'])->toArray();
         return $this->resSuccess('获取基本信息成功',
-            ['types'=>$types, 'troupes'=>$troupes, 'addrs'=>$addrs]);
+            ['types'=>$types, 'troupes'=>$troupes, 'addrs'=>$addrs, "baktypes" => $baktypes]);
     }
 
     /**

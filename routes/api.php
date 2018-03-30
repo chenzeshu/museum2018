@@ -5,6 +5,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function (){
     Route::post('login', 'AuthController@login');
     Route::get('test', 'TestController@test');
     Route::group(['middleware' => ['jwt.auth', 'jwt.refresh']], function(){
+        //演出
         Route::post('performance/page', 'PerformanceController@page');
         Route::get('performance/baseData', 'PerformanceController@fetchBaseData');
         Route::post('performance/store', 'PerformanceController@store');
@@ -12,6 +13,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function (){
         Route::post('performance/upload', 'PerformanceController@upload');
         Route::get('performance/delete/{perf_id}', 'PerformanceController@delete');
 
+        //演员
+        Route::post('actor/page', 'ActorController@page');
         Route::post('actor/searchActors', 'ActorController@searchActors');
 
     });

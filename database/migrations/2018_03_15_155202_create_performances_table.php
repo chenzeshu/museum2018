@@ -25,6 +25,7 @@ class CreatePerformancesTable extends Migration
             $table->unsignedInteger('perf_addr')->nullable()->comment('演出地点');
             $table->unsignedSmallInteger('perf_duration')->nullable()->comment('视频时长，分钟');
             $table->unsignedMediumInteger('perf_size')->nullable()->comment('视频大小，MB');
+            $table->unsignedTinyInteger('perf_baktype')->default(1)->comment('备份类型');
             $table->timestamps();
 
             $table->index('perf_type')->comment('索引：去找剧种信息');
@@ -65,18 +66,6 @@ class CreatePerformancesTable extends Migration
             $table->index('perf_id')->comment('索引：找演出本体');
         });
 
-
-
-        //演出备份记录表
-        Schema::create('performance_bak_records', function (Blueprint $table) {
-            $table->increments('pbr_id');
-            $table->unsignedInteger('perf_id')->comment('演出id');
-            $table->unsignedTinyInteger('baktype_id')->comment('备份类型id');
-            $table->timestamps();
-
-            $table->index('perf_id')->comment('索引：找演出本体');
-            $table->index('baktype_id')->comment('索引：找备份本体');
-        });
     }
 
     /**
@@ -90,7 +79,6 @@ class CreatePerformancesTable extends Migration
         Schema::dropIfExists('performance_details');
         Schema::dropIfExists('performance_actors');
         Schema::dropIfExists('performance_files');
-        Schema::dropIfExists('performance_baks');
         Schema::dropIfExists('performance_bak_records');
     }
 }

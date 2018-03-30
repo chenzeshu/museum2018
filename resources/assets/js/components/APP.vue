@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <Home class="test" v-if="flagLogin"></Home>
+        <Home v-if="flagLogin"></Home>
         <Login v-else></Login>
     </div>
 </template>
@@ -40,14 +40,6 @@
                         this.changeFlagLogin(true)
                     }
                 }
-            },
-            test(){
-                this.$http.get('/test')
-                    .then(res=>{
-                        console.log(res)
-                    }, err=>{
-                        console.log(err)
-                    })
             },
             ...mapMutations({
                 changeFlagLogin:'CHANGE_FLAG_LOGIN'
