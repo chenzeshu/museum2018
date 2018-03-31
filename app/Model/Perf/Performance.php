@@ -77,6 +77,7 @@ class Performance extends Model
     }
 
     /**
+     * 根据条件对自身表的字段进行筛选
      * scope 定义要大写，但是注意使用时全部要小写
      * @param $sc 检索条件
      */

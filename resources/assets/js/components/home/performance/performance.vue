@@ -267,7 +267,6 @@
             return {
                 //基础数据
                 name: "performance",
-                tableWidth: 1080,   //默认表格宽度
                 //模态框
                     //演员详情
                     actorDetailFlag: false,
@@ -390,6 +389,7 @@
                         key: 'perf_baktype',
                         width: 100,
                         render: (h, params) => {
+                            if(!params.row.perf_baktype) return;
                             let type = params.row.perf_baktype.baktype_id === 1 ? 'warning' : 'success'
                             return h('span',  [
                                 h('Button', {
@@ -460,9 +460,6 @@
             },this.delay))
         },
         mounted(){
-            //todo mounted 一般跟dom有关初始化的在这个周期开始操作
-            //调整表格大小
-            this.resetTableWidth()
             //获取数据
             this.fetchData('page')
             //获取工具数据：剧团、剧种、演出地点
@@ -570,14 +567,7 @@
                 this.perfDetailFlag = !this.perfDetailFlag
                 this.perfDetail = data
             },
-            resetTableWidth(){
-                let curComponentWidth = document.querySelectorAll("div[class='ivu-layout-content']")[0].clientWidth
-                if(curComponentWidth > 1400){
-                    this.tableWidth = 1280
-                }else{
-                    this.tableWidth = curComponentWidth *0.8
-                }
-            },
+
             //剧种、剧团、地址
             fetchBaseData(){
                 this.$http

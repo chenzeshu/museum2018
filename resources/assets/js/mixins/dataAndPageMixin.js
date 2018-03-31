@@ -1,7 +1,9 @@
 import {mapGetters, mapMutations} from 'vuex'
+import params from '@utils/params'
 
 //tips: 分页一般和主fetData在一起，所以写一起了
-//tipd2: 引用这个mixin后，主component只需要造几个延迟获取工具数据函数即可
+//tips2: 引用这个mixin后，主component只需要造几个延迟获取工具数据函数即可
+//tips3: 本页也做了table的宽度自适应
 export default {
     data(){
         return {
@@ -10,12 +12,17 @@ export default {
             page: 1,
             pageSize: 10,
             loading: false,     //主fetchDataLoding标志
+            //table宽度
+            tableWidth: 0,
         }
     },
     computed:{
         ...mapGetters([
             'tableData'
         ])
+    },
+    mounted(){
+        this.resetTableWidth()
     },
     methods:{
         //翻页+电梯
@@ -43,6 +50,16 @@ export default {
                     this.setTableData(res.data.data)
                     this.count = res.data.count
                 })
+        },
+        resetTableWidth(){
+            let curComponentWidth = document.querySelectorAll("div[class='ivu-layout-content']")[0].clientWidth
+
+            let tableWidth = Reflect.get(params.tableWidth, this.name)
+            if(curComponentWidth > tableWidth.threshold){
+                this.tableWidth = tableWidth.default
+            }else{
+                this.tableWidth = curComponentWidth * tableWidth.coefficient
+            }
         },
         ...mapMutations({
             setTableData:'SET_TABLE_DATA'

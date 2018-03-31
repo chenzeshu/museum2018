@@ -26,7 +26,7 @@ class PerformanceController extends CommonController
     {
         $sc = $request->searchCondition;
         $perfs = Performance::fetchdata($sc);
-        $data = $this->dao->fetDataAndCountWithPage($request, $perfs, $sc);
+        $data = $this->dao->fetchPageWithScForRelation($request, $perfs, $sc);
 
         return $this->resSuccess('获取演出信息成功', $data);
     }
@@ -47,6 +47,7 @@ class PerformanceController extends CommonController
 
     /**
      * 新增
+     * fixme：没有做表单校验
      */
     public function store(Request $request)
     {
@@ -58,6 +59,7 @@ class PerformanceController extends CommonController
 
     /**
      * 更新
+     * fixme：没有做表单校验
      */
     public function update(Request $request)
     {
@@ -87,7 +89,7 @@ class PerformanceController extends CommonController
      */
     public function upload(Request $request)
     {
-        Performance::findOrFail($request->perf_id)->perfFiles()->sync($request->photoList);
+        Performance::findOrFail($request->perf_id)->perfFiles()->sync($request->photoList, ['updated_at'=>date('Y-m-d H:i:s', time())]);
         return $this->resSuccess('文件上传成功', []);
     }
 }

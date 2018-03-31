@@ -15,8 +15,12 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function (){
 
         //演员
         Route::post('actor/page', 'ActorController@page');
+        Route::get('actor/baseData', 'ActorController@fetchBaseData');
         Route::post('actor/searchActors', 'ActorController@searchActors');
-
+        Route::post('actor/store', 'ActorController@store');
+        Route::post('actor/update', 'ActorController@update');
+        Route::post('actor/upload', 'ActorController@upload');
+        Route::get('actor/delete/{actor_id}', 'ActorController@delete');
     });
     Route::post('file/upload', 'FileController@upload');        //验证可以放后面做
 });

@@ -11,11 +11,15 @@ namespace App\DAO;
 
 use App\Model\Common\Record;
 use App\Model\Perf\Performance;
-use App\Model\Perf\PerformanceActor;
 
-class PerformanceDao extends PerformanceActor
+class PerformanceDao
 {
-    public function fetDataAndCountWithPage($request, $perf, $sc)
+    /**
+     * 根据条件对relation们筛选行为
+     * @param $perf
+     * @param $sc   搜索条件
+     */
+    public function fetchPageWithScForRelation($request, $perf, $sc)
     {
         $pageSize = $request->pageSize;
         $begin = ($request->page - 1) * $pageSize;
@@ -92,10 +96,18 @@ class PerformanceDao extends PerformanceActor
     }
 
 
-    //todo 更新演员
+    /**todo 更新演员
+     * $request->perf_actors 是个数组
+     */
     public function updatePerfActors($perf, $request)
     {
-        return $perf->perfActors()->sync($request->perf_actors);
+        $actors = collect($request->perf_actors)->toArray();
+        $newActors = [];
+        //参照文档，蛋疼的格式
+        foreach ($actors as $k => $actor){
+            $newActors[$actors[$k]] = ['updated_at'=>date('Y-m-d H:i:s', time())];
+        }
+        return $perf->perfActors()->sync($newActors);
     }
 
     //todo 更新演出内容、接收记录、输出记录
