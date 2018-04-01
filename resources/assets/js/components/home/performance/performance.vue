@@ -296,7 +296,7 @@
                         title: '编号',
                         key: 'perf_code',
                         width: 120,
-                        fixed: 'left'
+                        fixed: 'left',
                     },
                     {
                         title: '演出日期',
@@ -503,7 +503,6 @@
                 deleteKeyArr.forEach(key => {
                     Reflect.deleteProperty(body, key)
                 })
-                console.log(body)
                 return body
             },
                 //pakAdd和pakEdit都用到的

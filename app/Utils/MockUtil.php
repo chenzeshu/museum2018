@@ -18,9 +18,28 @@ class MockUtil
      */
     static public function mockGetPerfCode($year){
         $record = Record::findOrFail(1);
-        $number = $record->record_number;       //填充时不需要++
+        $number = ++$record->record_number;       //填充时不需要++
+        $number = self::padZero($number);
         $record->increment('record_number');
         return intval($year . $number);
+    }
+
+    /**
+     * 补0函数
+     */
+    static private function padZero($number){
+        $adder = "";
+        switch (strlen($number)){
+            case 1:
+                $adder = "00";
+                break;
+            case 2:
+                $adder = "0";
+                break;
+            default:
+                break;
+        }
+        return $adder.$number;
     }
 
     static public function generate_password( $length = 8 ) {

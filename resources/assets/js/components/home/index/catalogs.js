@@ -24,10 +24,10 @@ export const catalogs = [
                 icon: "man",
                 path: '/actor'
             },
-            {
-                name:"2-2",
-                title:"foo"
-            },
+            // {
+            //     name:"2-2",
+            //     title:"foo"
+            // },
         ]
     },
     {
@@ -38,22 +38,26 @@ export const catalogs = [
             {
                 name: "3-1",
                 icon: "ios-people",
-                title: "剧团"
+                title: "剧团",
+                path: '/troupe'
             },
             {
                 name:"3-2",
                 icon: "ios-pricetag",
-                title:"剧种"
+                title:"剧种",
+                path: '/type'
             },
             {
                 name:"3-3",
                 icon: "location",
-                title:"演出地点"
+                title:"演出地点",
+                path: '/addr'
             },
             {
                 name:"3-4",
                 icon: "android-settings",
-                title:"备份类型"
+                title:"备份类型",
+                path: '/baktype'
             },
         ]
     },
@@ -65,7 +69,8 @@ export const catalogs = [
             {
                 name:"4-1",
                 icon: "person",
-                title:"用户表"
+                title:"用户表",
+                path: '/user'
             },
         ]
     },

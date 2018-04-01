@@ -177,10 +177,13 @@
                 editObj: {actor_troupeNow:{troupe_id:""}},
                 columns: [
                     {
-                        title: 'ID',
+                        title: '序号',
                         key: 'actor_id',
                         width: 80,
-                        fixed: 'left'
+                        fixed: 'left',
+                        render: (h, params) => {
+                            return h('span', ++params.index)
+                        }
                     },
                     {
                         title: '演员姓名',
@@ -300,7 +303,6 @@
             toggleHistoryModal(histories){
                 this.historyFlag = !this.historyFlag
                 this.histories = cloneDeep(histories).reverse()
-                console.log(this.histories)
                 this.now = this.histories.length > 0 ? this.histories.shift() : {}
             },
             toggleRecordModal(record){

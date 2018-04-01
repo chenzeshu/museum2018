@@ -91,10 +91,28 @@ class PerformanceDao
         $year = date('Y', time());          //todo 当年年份全写
         $record = Record::findOrFail(1);            //todo 得到序号记录
         $number = ++ $record->record_number;
+        $number = $this->padZero($number);          //左补零
         $record->increment('record_number');        //todo 自增1
         return intval($year.$number);
     }
 
+    /**
+     * 补0函数
+     */
+    private function padZero($number){
+        $adder = "";
+        switch (strlen($number)){
+            case 1:
+                $adder = "00";
+                break;
+            case 2:
+                $adder = "0";
+                break;
+            default:
+                break;
+        }
+        return $adder.$number;
+    }
 
     /**todo 更新演员
      * $request->perf_actors 是个数组
