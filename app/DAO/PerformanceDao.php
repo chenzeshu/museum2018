@@ -12,7 +12,7 @@ namespace App\DAO;
 use App\Model\Common\Record;
 use App\Model\Perf\Performance;
 
-class PerformanceDao
+class PerformanceDao extends CommonDao
 {
     /**
      * 根据条件对relation们筛选行为
@@ -21,8 +21,8 @@ class PerformanceDao
      */
     public function fetchPageWithScForRelation($request, $perf, $sc)
     {
-        $pageSize = $request->pageSize;
-        $begin = ($request->page - 1) * $pageSize;
+        list($pageSize, $begin) = $this->calBeginPage($request);
+
         $data = $perf->offset($begin)
                     ->limit($pageSize)
                     ->with([

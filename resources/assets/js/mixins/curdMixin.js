@@ -23,6 +23,12 @@ export default {
         _resetAddObj(){
           return {}
         },
+        _pakAddBody() {
+            return Object.assign({}, this.addObj)
+        },
+        _pakEditBody() {
+            return Object.assign({}, this.editObj)
+        },
         toggleEditModal(source, index) {
             this.editIndex = index
             this.editFlag = !this.editFlag

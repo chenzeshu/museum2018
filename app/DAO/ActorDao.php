@@ -9,13 +9,11 @@
 namespace App\DAO;
 
 
-class ActorDao
+class ActorDao extends CommonDao
 {
     public function fetchPageWithScForRelation($request, $actors, $sc)
     {
-        $page = $request->page;
-        $pageSize = $request->pageSize;
-        $begin = ( $page - 1 ) * $pageSize;
+        list($pageSize, $begin) = $this->calBeginPage($request);
 
         $data = $actors->with(['actorTroupeHistories',
                                'actorFiles' => function($query) use ($sc){

@@ -2,6 +2,12 @@ function photoReplacePath(path) {
     return path.replace(/public/, "http://laravel.test/storage")
 }
 
+//剧种等只有一个name这类表
+const smallWidth = {
+    threshold: 980,        //开始自适应的阈值
+    default: 980,       //表格默认宽度
+    coefficient: 0.9       //表格宽度伸展系数
+}
 
 export default {
     baseUrl: 'http://laravel.test/api/v1',
@@ -16,8 +22,12 @@ export default {
         actor:{
             threshold: 1300,        //开始自适应的阈值
             default: 920,       //表格默认宽度
-            coefficient: 0.72       //表格宽度伸展系数
-        }
+            coefficient: 0.72       //自适应时表格宽度伸展系数
+        },
+        troupe: smallWidth,
+        type: smallWidth,
+        baktype: smallWidth,
+        addr: smallWidth,
     },
 
     photoReplacePath,
