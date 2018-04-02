@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\v1\utils;
 
-use App\DAO\AddrDao;
+use App\DAO\utils\AddrDao;
 use App\Http\Controllers\v1\CommonController;
 use App\Model\Common\Addr;
 use Illuminate\Http\Request;

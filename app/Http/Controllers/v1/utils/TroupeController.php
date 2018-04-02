@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\v1\utils;
 
-use App\DAO\TroupeDao;
+
+use App\DAO\utils\TroupeDao;
 use App\Http\Controllers\v1\CommonController;
 use App\Model\Common\Troupe;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class TroupeController extends CommonController
 {

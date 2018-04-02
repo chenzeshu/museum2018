@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\v1\utils;
 
-use App\DAO\BakTypeDao;
+
+use App\DAO\utils\BakTypeDao;
 use App\Http\Controllers\v1\CommonController;
 use App\Model\Common\Baktype;
 use Illuminate\Http\Request;

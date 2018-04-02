@@ -72,9 +72,9 @@
 <script>
     import dataAndPageMixin from '@mixins/dataAndPageMixin.js'
     import curdMixin from '@mixins/curdMixin.js'
-
+    import defaultPathMixin from '@mixins/defaultPathMixin.js'
     export default {
-        mixins: [dataAndPageMixin, curdMixin],
+        mixins: [dataAndPageMixin, curdMixin, defaultPathMixin],
         name: "baktype",
         data(){
             return {
@@ -138,6 +138,7 @@
         },
         mounted(){
             this.fetchData('page')
+            this.setDefaultPathAndCatalog()
         },
         methods:{
             toggleSearchModal(){

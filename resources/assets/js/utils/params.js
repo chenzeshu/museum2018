@@ -28,6 +28,7 @@ export default {
         type: smallWidth,
         baktype: smallWidth,
         addr: smallWidth,
+        user: smallWidth
     },
 
     photoReplacePath,

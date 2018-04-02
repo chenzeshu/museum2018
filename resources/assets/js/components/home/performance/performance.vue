@@ -258,10 +258,11 @@
     import photoMixin from '@mixins/photoMixin.js'
     import dataAndPageMixin from '@mixins/dataAndPageMixin.js'
     import curdMixin from '@mixins/curdMixin.js'
+    import defaultPathMixin from '@mixins/defaultPathMixin.js'
 
     var interval;
     export default {
-        mixins: [photoMixin, dataAndPageMixin, curdMixin],
+        mixins: [photoMixin, dataAndPageMixin, curdMixin, defaultPathMixin],
         name: "performance",
         data(){
             return {
@@ -462,6 +463,7 @@
         mounted(){
             //获取数据
             this.fetchData('page')
+            this.setDefaultPathAndCatalog()
             //获取工具数据：剧团、剧种、演出地点
             setTimeout(()=>{
                 this.fetchBaseData()

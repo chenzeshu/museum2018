@@ -6,23 +6,23 @@
  * Time: 19:59
  */
 
-namespace App\DAO;
+namespace App\DAO\utils;
 
-use App\Model\Common\Addr;
+use App\DAO\CommonDao;
 use App\Model\Common\Troupe;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class AddrDao extends CommonDao
+class TroupeDao extends CommonDao
 {
     public function fetchPageWithScForRelation(Request $request, $sc)
     {
         list($pageSize, $begin) = $this->calBeginPage($request);
-
-        $troupes = Addr::where(function ($query) use ($sc){
-                                if(!empty($sc['addr_name'])){
-                                    $query->where('addr_name', 'like',"%".$sc['addr_name']."%");
+        $troupes = Troupe::where(function ($query) use ($sc){
+                                if(!empty($sc['troupe_name'])){
+                                    $query->where('troupe_name', 'like',"%".$sc['troupe_name']."%");
                                 }
-                            })->orderBy('addr_id', 'desc');
+                            })->orderBy('troupe_id', 'desc');
         $data = $troupes->offset($begin)
             ->limit($pageSize)
             ->get()

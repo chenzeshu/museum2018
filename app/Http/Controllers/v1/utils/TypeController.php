@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\v1\utils;
 
-use App\DAO\TypeDao;
+use App\DAO\utils\TypeDao;
 use App\Http\Controllers\v1\CommonController;
 use App\Model\Common\Type;
 use Illuminate\Http\Request;

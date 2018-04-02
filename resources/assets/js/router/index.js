@@ -12,6 +12,7 @@ import Type from '../components/home/others/type/Type'
 import Baktype from '../components/home/others/baktype/Baktype'
 import User from '../components/home/manager/user/User'
 
+
 export default new VueRouter({
     routes: [
         {
@@ -42,7 +43,6 @@ export default new VueRouter({
             path: '/user',
             component: User
         },
-
     ],
 })
 

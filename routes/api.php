@@ -46,6 +46,12 @@ Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function (){
             Route::post('baktype/store', 'utils\BaktypeController@store');
             Route::post('baktype/update', 'utils\BaktypeController@update');
             Route::get('baktype/delete/{baktype_id}', 'utils\BaktypeController@delete');
+
+        //用户表
+        Route::post('user/page', 'UserController@page');
+        Route::post('user/store', 'UserController@store');
+        Route::post('user/update', 'UserController@update');
+        Route::get('user/delete/{user_id}', 'UserController@delete');
     });
     Route::post('file/upload', 'FileController@upload');        //验证可以放后面做
 });

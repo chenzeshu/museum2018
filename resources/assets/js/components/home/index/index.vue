@@ -10,7 +10,7 @@
         <Layout>
             <Sider ref="side1" hide-trigger collapsible :collapsed-width="78" v-model="isCollapsed" style="min-height:99.5vh">
                 <Menu :active-name="activeName" :open-names="openNames" theme="dark" width="auto" :class="menuitemClasses"
-                      accordion>
+                      accordion ref="side_menu">
                     <Submenu v-for="(catalog, index) of catalogs" :key="index" :name="catalog.name" ref="subMenu">
                         <template slot="title" v-show="!isCollapsed">
                             <Icon :type="catalog.iconType"></Icon>
@@ -108,13 +108,13 @@
     import {mapGetters, mapMutations} from 'vuex'
     import storage from 'good-storage'
     import {catalogs} from './catalogs'
+
     export default {
         data () {
             return {
                 isCollapsed: false, //是否横向折叠
-                activeName: "1-1",
-                openNames: ['1'],
-                catalogs: catalogs
+                catalogs: catalogs,
+                openNameSlice:[]
             }
         },
         computed: {
@@ -134,8 +134,14 @@
 
             },
             ...mapGetters([
-                'flagLogin'
+                'flagLogin', 'activeName', 'openNames'
             ])
+        },
+        mounted(){
+            this.$nextTick(() => {
+                this.$refs.side_menu.updateOpened();
+                this.$refs.side_menu.updateActiveName();
+            })
         },
         methods: {
             collapsedSider () {

@@ -23,11 +23,7 @@ export const catalogs = [
                 title: "演员",
                 icon: "man",
                 path: '/actor'
-            },
-            // {
-            //     name:"2-2",
-            //     title:"foo"
-            // },
+            }
         ]
     },
     {

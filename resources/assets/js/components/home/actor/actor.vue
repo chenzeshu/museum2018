@@ -152,9 +152,9 @@
     import photoMixin from '@mixins/photoMixin.js'
     import dataAndPageMixin from '@mixins/dataAndPageMixin.js'
     import curdMixin from '@mixins/curdMixin.js'
-
+    import defaultPathMixin from '@mixins/defaultPathMixin.js'
     export default {
-        mixins: [photoMixin, dataAndPageMixin, curdMixin],
+        mixins: [photoMixin, dataAndPageMixin, curdMixin, defaultPathMixin],
         name: "actor",
         data(){
             return {
@@ -295,6 +295,7 @@
         mounted(){
             //表格重置宽度
             this.resetTableWidth()
+            this.setDefaultPathAndCatalog()
             //获取数据
             this.fetchData('page')
             setTimeout(this._fetBaseData, 1000)
