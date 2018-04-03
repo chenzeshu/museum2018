@@ -32,10 +32,10 @@
                 <FormItem label="剧团名称">
                     <Input placeholder="模糊名称" v-model="searchObj.troupe_name" style="width:160px"></Input>
                 </FormItem>
-                <FormItem label="彩蛋：演员个数">
-                </FormItem>
-                <FormItem label="彩蛋：演出个数">
-                </FormItem>
+                <!--<FormItem label="彩蛋：演员个数">-->
+                <!--</FormItem>-->
+                <!--<FormItem label="彩蛋：演出个数">-->
+                <!--</FormItem>-->
             </Form>
         </Modal>
         <!--新增-->

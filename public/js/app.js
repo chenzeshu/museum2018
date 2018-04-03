@@ -11921,11 +11921,7 @@ var render = function() {
                   })
                 ],
                 1
-              ),
-              _vm._v(" "),
-              _c("FormItem", { attrs: { label: "彩蛋：演员个数" } }),
-              _vm._v(" "),
-              _c("FormItem", { attrs: { label: "彩蛋：演出个数" } })
+              )
             ],
             1
           )
