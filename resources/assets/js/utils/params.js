@@ -1,5 +1,5 @@
-const domain = "http://laravel.test"
-// const domain = "http://mu.dep"
+// const domain = "http://laravel.test"
+const domain = process.env.NODE_ENV === 'prodction' ? "http://mu.dep" : "http://laravel.test"
 
 function photoReplacePath(path) {
     return path.replace(/public/, `${domain}/storage`)
@@ -7,9 +7,9 @@ function photoReplacePath(path) {
 
 //剧种等只有一个name这类表
 const smallWidth = {
-    threshold: 980,        //开始自适应的阈值
-    default: 980,       //表格默认宽度
-    coefficient: 0.9       //表格宽度伸展系数
+    threshold: 1210,        //开始自适应的阈值
+    default: 950,       //表格默认宽度
+    coefficient: 0.75       //表格宽度伸展系数
 }
 
 export default {

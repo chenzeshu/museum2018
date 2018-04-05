@@ -2564,22 +2564,22 @@ var index_esm = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var domain = "http://laravel.test";
-// const domain = "http://mu.dep"
+// const domain = "http://laravel.test"
+var domain =  false ? "http://mu.dep" : "http://laravel.test";
 
 function photoReplacePath(path) {
-    return path.replace(/public/, domain + '/storage');
+    return path.replace(/public/, domain + "/storage");
 }
 
 //剧种等只有一个name这类表
 var smallWidth = {
-    threshold: 980, //开始自适应的阈值
-    default: 980, //表格默认宽度
-    coefficient: 0.9 //表格宽度伸展系数
+    threshold: 1210, //开始自适应的阈值
+    default: 950, //表格默认宽度
+    coefficient: 0.75 //表格宽度伸展系数
 };
 
 /* harmony default export */ __webpack_exports__["a"] = ({
-    baseUrl: domain + '/api/v1',
+    baseUrl: domain + "/api/v1",
     photoFormat: ['jpg', 'jpeg', 'png'],
     photoSingleSize: 500,
     tableWidth: {
