@@ -5,11 +5,6 @@ import axios from './axios'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css';
 import storage from 'good-storage'
-// import VueLazyload from 'vue-lazyload'
-
-// Vue.use(VueLazyload, {
-//     lazyComponent:true
-// })
 
 Vue.use(iView)
 window.Vue = Vue

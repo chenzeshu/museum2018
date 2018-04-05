@@ -40,6 +40,7 @@ class CreatePerformancesTable extends Migration
             $table->string('perf_content', 600)->nullable()->comment('演员id');
             $table->string('perf_receive', 600)->nullable()->comment('接收记录');
             $table->string('perf_output', 600)->nullable()->comment('输出记录');
+            $table->string('perf_remark', 450)->nullable()->comment('备注');
             $table->timestamps();
 
             $table->index('perf_id')->comment('索引：找演出本体');

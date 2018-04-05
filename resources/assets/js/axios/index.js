@@ -26,16 +26,16 @@ axios.interceptors.response.use(response => {
     storage.set('token', token)
     return response
 }, error => {
-    let status = error.response.status
-    let err = error.response.data
+    let status = error.response.status,
+        err = error.response.data
+
     //是不是用HTTP状态码更好？这样子感觉很乱
     switch (status){
         case 401:
             report(error, err, status)
             state.flagLogin = false
             break
-        case -10002:
-            //密码错误
+        case 500:
             app.$Message.error(err.msg)
             break
         default:
@@ -49,7 +49,12 @@ function report( error, err, status) {
     if(err.code && err.msg){
         app.$Message.error(`${err.code} : ${err.msg}`)
     }else{
-        app.$Message.error(`${status}: ${error.response.data.error}`)
+        //token invalid
+        app.$Message.error({
+            content: `${status}: 登陆过期，请重新登陆，或不要过快刷新`,
+            // content: `${status}: 请勿过快刷新${error.response.data.error}`,
+            duration: 3
+        })
     }
 }
 

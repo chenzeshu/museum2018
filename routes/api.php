@@ -3,7 +3,7 @@
 Route::group(['prefix' => 'v1', 'namespace' => 'v1'], function (){
     //登陆
     Route::post('login', 'AuthController@login');
-    Route::get('test', 'TestController@test');
+    Route::post('test', 'TestController@test');
     Route::group(['middleware' => ['jwt.auth', 'jwt.refresh']], function(){
         //演出
         Route::post('performance/page', 'PerformanceController@page');

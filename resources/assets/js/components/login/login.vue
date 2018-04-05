@@ -159,11 +159,12 @@
         },
         methods:{
             login(){
+                let body = {
+                    phone: this.phone,
+                    password: this.password
+                }
                 this.$http
-                    .post('/login', {
-                        phone: this.phone,
-                        password: this.password
-                    })
+                    .post('/login', body)
                     .then(res=>{
                         this.$Message.success(res.data.msg)
                         this.$router.push('/performance')

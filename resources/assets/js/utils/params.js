@@ -1,5 +1,8 @@
+const domain = "http://laravel.test"
+// const domain = "http://mu.dep"
+
 function photoReplacePath(path) {
-    return path.replace(/public/, "http://laravel.test/storage")
+    return path.replace(/public/, `${domain}/storage`)
 }
 
 //剧种等只有一个name这类表
@@ -10,7 +13,7 @@ const smallWidth = {
 }
 
 export default {
-    baseUrl: 'http://laravel.test/api/v1',
+    baseUrl: `${domain}/api/v1`,
     photoFormat: ['jpg','jpeg','png'],
     photoSingleSize: 500,
     tableWidth: {

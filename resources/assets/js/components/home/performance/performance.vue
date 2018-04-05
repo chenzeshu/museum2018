@@ -44,6 +44,8 @@
             <p><b>接收记录</b>：{{perfDetail.perf_receive}}</p>
             <br>
             <p><b>输出记录</b>：{{perfDetail.perf_output}}</p>
+            <br>
+            <p><b>其他备注</b>：{{perfDetail.perf_remark}}</p>
         </Modal>
         <!--检索-->
         <Modal
@@ -142,6 +144,9 @@
                     <FormItem label="输出记录">
                         <Input v-model="addObj.perf_output" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
                     </FormItem>
+                    <FormItem label="其他备注">
+                        <Input v-model="addObj.perf_remark" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
                     <FormItem label="视频长度">
                         <Input type="text" v-model="addObj.perf_duration" number></Input>
                     </FormItem>
@@ -216,6 +221,9 @@
                     </FormItem>
                     <FormItem label="输出记录">
                         <Input v-model="editObj.perf_output" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
+                    </FormItem>
+                    <FormItem label="其他备注">
+                        <Input v-model="editObj.perf_remark" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="写点什么..."></Input>
                     </FormItem>
                     <FormItem label="视频长度">
                         <Input type="text" v-model="editObj.perf_duration" number></Input>

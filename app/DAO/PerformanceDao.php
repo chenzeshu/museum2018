@@ -11,6 +11,7 @@ namespace App\DAO;
 
 use App\Model\Common\Record;
 use App\Model\Perf\Performance;
+use Illuminate\Http\Request;
 
 class PerformanceDao extends CommonDao
 {
@@ -19,7 +20,7 @@ class PerformanceDao extends CommonDao
      * @param $perf
      * @param $sc   搜索条件
      */
-    public function fetchPageWithScForRelation($request, $perf, $sc)
+    public function fetchPageWithScForRelation(Request $request, $perf, $sc)
     {
         list($pageSize, $begin) = $this->calBeginPage($request);
 
@@ -51,7 +52,7 @@ class PerformanceDao extends CommonDao
      * @param {stdClass} $perf Perfomance表本体
      * @param $request
      */
-    public function addPerfActors($perf, $request)
+    public function addPerfActors($perf, Request $request)
     {
         $actors = $request->perf_actors;
         $perf->perfActors()->attach($actors);
@@ -62,22 +63,18 @@ class PerformanceDao extends CommonDao
      * @param {stdClass} $perf Perfomance表本体
      * @param $request
      */
-    public function addPerfDetail($perf, $request)
+    public function addPerfDetail($perf, Request $request)
     {
-        $details = [
-            'perf_content' => $request->perf_content,
-            'perf_receive' => $request->perf_receive,
-            'perf_output' => $request->perf_output
-        ];
+        $details = $this->pakDetailsArr($request);
         $perf->perfDetail()->create($details);
     }
 
     /**
      * 新增一个performance
      */
-    public function addPerfSelf($request)
+    public function addPerfSelf(Request $request)
     {
-        $self = $request->except(['perf_actors', 'perf_content', 'perf_receive', 'perf_output']);
+        $self = $request = $this->exceptRequest($request);
         $perf_code = $this->producePerfCode();
         $self = Performance::create(array_merge($self, ['perf_code' => $perf_code]));
         return $self;
@@ -117,7 +114,7 @@ class PerformanceDao extends CommonDao
     /**todo 更新演员
      * $request->perf_actors 是个数组
      */
-    public function updatePerfActors($perf, $request)
+    public function updatePerfActors($perf, Request $request)
     {
         $actors = collect($request->perf_actors)->toArray();
         $newActors = [];
@@ -129,20 +126,40 @@ class PerformanceDao extends CommonDao
     }
 
     //todo 更新演出内容、接收记录、输出记录
-    public function updatePerfDetail($perf, $request)
+    public function updatePerfDetail($perf, Request $request)
     {
-        $details = [
-            'perf_content' => $request->perf_content,
-            'perf_receive' => $request->perf_receive,
-            'perf_output' => $request->perf_output
-        ];
+        $details = $this->pakDetailsArr($request);
         return $perf->perfDetail()->update($details);
     }
 
     //todo 更新performance表
-    public function updatePerfSelf($perf, $request)
+    public function updatePerfSelf($perf, Request $request)
     {
-        $request = $request->except(['perf_actors', 'perf_content', 'perf_receive', 'perf_output']);
+        $request = $this->exceptRequest($request);
         return $perf->update($request);
+    }
+
+    /**
+     * 为更新主表，去除request的多余项
+     * @param Request $request
+     * @return array
+     */
+    private function exceptRequest(Request $request){
+        $exceptions = ['perf_actors', 'perf_content', 'perf_receive', 'perf_output', 'perf_remark'];
+        return $request->except($exceptions);
+    }
+
+    /**
+     * 组装$details详情表的数组
+     * @param Request $request
+     * @return array
+     */
+    private function pakDetailsArr(Request $request){
+        return [
+            'perf_content' => $request->perf_content,
+            'perf_receive' => $request->perf_receive,
+            'perf_output' => $request->perf_output,
+            'perf_remark' => $request->perf_output
+        ];
     }
 }
