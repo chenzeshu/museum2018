@@ -57,22 +57,32 @@
                 <FormItem label="演出日期">
                     <DatePicker :value="searchObj.perf_date" format="yyyy/MM/dd" type="daterange" placement="bottom-end"
                                 placeholder="Select date" style="width: 200px"
-                                @on-change="_selectDateForSearch"></DatePicker>
+                                @on-change="_selectDateForSearch"
+                                @on-clear="_clearDateForSearch"></DatePicker>
                 </FormItem>
                 <FormItem label="剧种">
-                    <Select v-model="searchObj.perf_type.type_id" style="width:200px">
+                    <Select v-model="searchObj.perf_type.type_id" style="width:200px" :clearable="true" ref="perfType">
                         <Option v-for="(type, index) of types" :value="type.type_id" :key="index">{{ type.type_name }}</Option>
                     </Select>
+                    <span class="select-clear-button" @click="clearPerfType">
+                        <Icon type="close-circled"></Icon>
+                    </span>
                 </FormItem>
                 <FormItem label="剧团">
-                    <Select v-model="searchObj.perf_troupe.troupe_id" style="width:200px">
+                    <Select v-model="searchObj.perf_troupe.troupe_id" style="width:200px"  :clearable="true" ref="perfTroupe">
                         <Option v-for="(troupe, index) of troupes" :value="troupe.troupe_id" :key="index">{{ troupe.troupe_name }}</Option>
                     </Select>
+                    <span class="select-clear-button" @click="clearPerfTroupe">
+                        <Icon type="close-circled"></Icon>
+                    </span>
                 </FormItem>
                 <FormItem label="演出地点">
-                    <Select v-model="searchObj.perf_addr.addr_id" style="width:200px">
+                    <Select v-model="searchObj.perf_addr.addr_id" style="width:200px"  :clearable="true" ref="perfAddr">
                         <Option v-for="(addr, index) of addrs" :value="addr.addr_id" :key="index">{{ addr.addr_name }}</Option>
                     </Select>
+                    <span class="select-clear-button" @click="clearPerfAddr">
+                        <Icon type="close-circled"></Icon>
+                    </span>
                 </FormItem>
                 <FormItem label="演员">
                     <Select
@@ -154,11 +164,11 @@
                         <Input type="text" v-model="addObj.perf_size" number></Input>
                     </FormItem>
                     <FormItem label="备份类型">
-                        <RadioGroup v-model="addObj.perf_baktype.baktype_id">
-                            <Radio  :label="baktype.baktype_id"  v-for="(baktype, index) of baktypes" :key="index">
-                                <span>{{baktype.baktype_name}}</span>
-                            </Radio>
-                        </RadioGroup>
+                        <CheckboxGroup v-model="addObj.perf_baktypes">
+                            <Checkbox  :label="baktype.baktype_id"  v-for="(baktype, index) of baktypes" :key="index">
+                                <span>{{ baktype.baktype_name }}</span>
+                            </Checkbox>
+                        </CheckboxGroup>
                     </FormItem>
                 </div>
             </Form>
@@ -232,11 +242,11 @@
                         <Input type="text" v-model="editObj.perf_size" number></Input>
                     </FormItem>
                     <FormItem label="备份类型">
-                        <RadioGroup v-model="editObj.perf_baktype.baktype_id">
-                            <Radio  :label="baktype.baktype_id"  v-for="(baktype, index) of baktypes" :key="index">
-                                <span>{{baktype.baktype_name}}</span>
-                            </Radio>
-                        </RadioGroup>
+                        <CheckboxGroup v-model="editObj.perf_baktypes">
+                            <Checkbox  :label="baktype.baktype_id"  v-for="(baktype, index) of baktypes" :key="index">
+                                <span>{{ baktype.baktype_name }}</span>
+                            </Checkbox>
+                        </CheckboxGroup>
                     </FormItem>
                 </div>
             </Form>
@@ -267,6 +277,8 @@
     import dataAndPageMixin from '@mixins/dataAndPageMixin.js'
     import curdMixin from '@mixins/curdMixin.js'
     import defaultPathMixin from '@mixins/defaultPathMixin.js'
+
+    import { filterSelect } from "./methodForSelect";
 
     var interval;
     export default {
@@ -395,19 +407,38 @@
                     },
                     {
                         title: '备份类型',
-                        key: 'perf_baktype',
-                        width: 100,
+                        key: 'perf_baktypes',
+                        width: 160,
                         render: (h, params) => {
-                            if(!params.row.perf_baktype) return;
-                            let type = params.row.perf_baktype.baktype_id === 1 ? 'warning' : 'success'
-                            return h('span',  [
-                                h('Button', {
-                                    props: {
-                                        type:  type,
-                                        size: 'small'
-                                    }
-                                }, params.row.perf_baktype.baktype_name)
-                            ])
+                            if(!params.row.perf_baktypes) return;
+                            else if (
+                                params.row.perf_baktypes.filter(item => parseInt(item.baktype_id) === 1).length === 1
+                            ) {
+                                return h('span',  [
+                                            h('Button', {
+                                                props: {
+                                                    type:  'warning',
+                                                    size: 'small'
+                                                }
+                                            }, params.row.perf_baktypes[0].baktype_name)
+                                        ])
+                            } else {
+                                let foo = []
+                                for (let value of params.row.perf_baktypes) {
+                                    foo.push(h('span',  [
+                                        h('Button', {
+                                            props: {
+                                                type:  'success',
+                                                size: 'small'
+                                            },
+                                            style: {
+                                                marginRight: '8px'
+                                            },
+                                        }, value.baktype_name)
+                                    ]))
+                                }
+                                return foo
+                            }
                         }
                     },
                     {
@@ -483,12 +514,16 @@
             clearInterval(interval)
         },
         methods:{
+            ...filterSelect,
             //检索
             toggleSearchModal(){
                 this.searchFlag = !this.searchFlag
             },
             _selectDateForSearch(v){
                 this.searchObj.perf_date = v
+            },
+            _clearDateForSearch(){
+                Reflect.deleteProperty(this.searchObj, 'perf_date')
             },
             search(){
                let body = Object.assign({}, this.searchObj)
@@ -501,7 +536,7 @@
             _pakAddBody(){
                 let body = objUtils.deepClone(this.addObj)
                 body = this._pakNormalBody(body)
-                this.addObj = this._resetAddObj(body)
+                this.addObj = this._resetAddObj()
                 return body
             },
             _pakEditBody(){
@@ -520,17 +555,17 @@
                     Reflect.set(body, 'perf_type', body.perf_type.type_id)
                     Reflect.set(body, 'perf_troupe', body.perf_troupe.troupe_id)
                     Reflect.set(body, 'perf_addr', body.perf_addr.addr_id)
-                    Reflect.set(body, 'perf_baktype', body.perf_baktype.baktype_id)
+                    Reflect.set(body, 'perf_baktypes', body.perf_baktypes)
                     return body
                 },
-            //addObj重置，复用在data定义和http通讯两个地方
+            //重置addObj，复用在data定义和http通讯两个地方
             _resetAddObj(){
                 return {
                     perf_troupe: {troupe_id:""},
                     perf_type:{type_id:""},
                     perf_addr:{addr_id:""},
                     perf_actors: [],
-                    perf_baktype:{baktype_id:""}
+                    perf_baktypes: []
                 }
             },
             _selectDateForAdd(v){
@@ -559,6 +594,9 @@
                     this.editIndex = index
                     this.editFlag = !this.editFlag
                     this.editObj = objUtils.deepClone(source)
+                    this.editObj.perf_baktypes = this.editObj.perf_baktypes.map(item => {
+                        return item.baktype_id
+                    })
                     this._initActorsValue()
                     this.editAlterFlag = false
             },
@@ -635,6 +673,7 @@
 </script>
 
 <style type="text/stylus" rel="stylesheet/stylus" lang="stylus">
+    @import "../../../../stylus/forSelect.styl"
     .module-performance
         .topbar
             height 32px

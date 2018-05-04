@@ -32,7 +32,11 @@ class UserController extends CommonController
 
     public function store(Request $request)
     {
-        User::create($request->all());
+        User::create([
+        	'user_phone' => $request->user_phone,
+ 			'user_nickname' => $request->user_nickname,
+            'user_pass' => bcrypt($request->user_pass)
+    	]);
 
         return $this->resSuccess('新增成功', []);
     }
@@ -40,7 +44,7 @@ class UserController extends CommonController
     public function update(Request $request)
     {
         User::findOrFail($request->user_id)->update([
-            'user_name' => $request->user_name,
+            'user_nickname' => $request->user_nickname,
             'user_pass' => bcrypt($request->user_pass)
         ]);
 

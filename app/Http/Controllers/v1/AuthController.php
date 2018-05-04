@@ -32,7 +32,5 @@ class AuthController extends Controller
             throw new UserNotExist();
         }
 
-
-
     }
 }

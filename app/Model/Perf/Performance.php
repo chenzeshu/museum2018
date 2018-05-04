@@ -71,9 +71,9 @@ class Performance extends Model
     /**
      * 关系--备份类型
      */
-    public function perfBaktype()
+    public function perfBaktypes()
     {
-        return $this->hasOne(Baktype::class, 'baktype_id', 'perf_baktype');
+        return $this->belongsToMany(Baktype::class, 'performance_baktypes', 'perf_id','baktype_id');
     }
 
     /**
@@ -85,7 +85,9 @@ class Performance extends Model
     {
         return $query->where(function ($query)use($sc){
                 if(!empty($sc['perf_date'])){
-                    $query->whereBetween('perf_date', $sc['perf_date']);
+                    if($sc['perf_date'][0] != ""){
+                        $query->whereBetween('perf_date', $sc['perf_date']);
+                    }
                 }
             })
             ->where(function ($query)use($sc){

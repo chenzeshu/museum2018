@@ -27,26 +27,48 @@ class PerformanceDao extends CommonDao
         $data = $perf->offset($begin)
                     ->limit($pageSize)
                     ->with([
-                        'perfActors'=>function($query)use($sc){
-                            if(!empty($sc['perf_actors'])){
-                                $query->whereIn('actor_id', $sc['perf_actors']);
+                        'perfActors' => function ($query) use ($sc) {
+                            if($sc['perf_actors']){
+                                $query->whereIn('performance_actors.actor_id', $sc['perf_actors']);
                             }
                          },
-                        'perfFiles'=>function($query){
+                        'perfFiles' => function ($query) {
                             $query->where('file_type', 'photo');
                         },
-                        'perfDetail', 'perfType', 'perfAddr', 'perfTroupe', 'perfBaktype'])
+                        'perfDetail', 'perfType', 'perfAddr', 'perfTroupe', 'perfBaktypes'])
                     ->orderBy('perf_id', 'desc')
                     ->get()
-                    ->toArray();;
+                    ->toArray();
         $count = $perf->count();
+
+        if(!empty($_data = $this->filterPerfActors($data, $sc))){
+            $data = $_data;
+        }
 
         return [
             'data' => $data,
             'count' => $count
         ];
     }
-    
+
+    /**
+     * 如果不做这个判断过滤，会将$SC['perf_actors']为空的数据也包括进来
+     * @param $data
+     * @param $sc
+     * @return array
+     */
+    private function filterPerfActors($data, $sc){
+        $newArray = array();
+        if(!empty($sc['perf_actors'])){
+            foreach ($data as $key => $value) {
+                if(!empty($data[$key]['perf_actors'])){
+                    $newArray[] = $data[$key];
+                }
+            }
+        }
+        return $newArray;
+    }
+
     /**
      * 新增performance的演员
      * @param {stdClass} $perf Perfomance表本体
@@ -70,11 +92,24 @@ class PerformanceDao extends CommonDao
     }
 
     /**
+     * 新增备份记录映射
+     * @param $perf
+     * @param Request $request
+     */
+    public function addPerfBakType($perf, Request $request)
+    {
+        $perf_baktypes = $request->perf_baktypes;
+        $perf->perfBaktypes()->attach($perf_baktypes);
+    }
+
+    /**
      * 新增一个performance
      */
     public function addPerfSelf(Request $request)
     {
-        $self = $request = $this->exceptRequest($request);
+        //todo 剔除这一步用不到的字段
+        $self = $this->exceptRequest($request);
+            //todo 生产编号
         $perf_code = $this->producePerfCode();
         $self = Performance::create(array_merge($self, ['perf_code' => $perf_code]));
         return $self;
@@ -132,6 +167,17 @@ class PerformanceDao extends CommonDao
         return $perf->perfDetail()->update($details);
     }
 
+    /**
+     * 更新备份记录映射
+     * @param $perf
+     * @param Request $request
+     */
+    public function updatePerfBakType($perf, Request $request)
+    {
+        $perf_baktypes = $request->perf_baktypes;
+        $perf->perfBaktypes()->sync($perf_baktypes);
+    }
+
     //todo 更新performance表
     public function updatePerfSelf($perf, Request $request)
     {
@@ -145,7 +191,7 @@ class PerformanceDao extends CommonDao
      * @return array
      */
     private function exceptRequest(Request $request){
-        $exceptions = ['perf_actors', 'perf_content', 'perf_receive', 'perf_output', 'perf_remark'];
+        $exceptions = ['perf_actors', 'perf_content', 'perf_receive', 'perf_output', 'perf_remark', 'perf_baktypes'];
         return $request->except($exceptions);
     }
 

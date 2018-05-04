@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class PerformanceController extends CommonController
 {
     protected $dao;
-
+    
     public function __construct(PerformanceDao $dao)
     {
         $this->dao = $dao;
@@ -54,6 +54,7 @@ class PerformanceController extends CommonController
         $perf = $this->dao->addPerfSelf($request);
         $this->dao->addPerfActors($perf, $request);
         $this->dao->addPerfDetail($perf, $request);
+        $this->dao->addPerfBakType($perf, $request);
         return $this->resSuccess('新增成功', []);
     }
 
@@ -66,6 +67,7 @@ class PerformanceController extends CommonController
         $perf = Performance::findOrFail($request->perf_id);
         $re1 = $this->dao->updatePerfActors($perf, $request);
         $re2 = $this->dao->updatePerfDetail($perf, $request);
+        $this->dao->updatePerfBakType($perf, $request);
         $re = $this->dao->updatePerfSelf($perf, $request);
         return $re&&$re1&&$re2 ? $this->resSuccess() : $this->resError();
     }

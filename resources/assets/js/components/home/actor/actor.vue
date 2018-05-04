@@ -388,6 +388,7 @@
 </script>
 
 <style type="text/stylus" rel="stylesheet/stylus" lang="stylus">
+    @import "../../../../stylus/forSelect.styl"
     .actor
         .topbar
             height 32px

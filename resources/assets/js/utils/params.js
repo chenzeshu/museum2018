@@ -1,5 +1,5 @@
 // const domain = "http://laravel.test"
-const domain = process.env.NODE_ENV === 'prodction' ? "http://mu.dep" : "http://laravel.test"
+const domain = process.env.NODE_ENV === 'production' ? "http://mu.dep" : "http://mu.dep"
 
 function photoReplacePath(path) {
     return path.replace(/public/, `${domain}/storage`)

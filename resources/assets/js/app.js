@@ -5,6 +5,8 @@ import axios from './axios'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css';
 import storage from 'good-storage'
+import "../stylus/index.styl"
+
 
 Vue.use(iView)
 window.Vue = Vue
